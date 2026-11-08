@@ -8,9 +8,9 @@
 
 Analyze a local codebase, inspect approved HTTP endpoints, optionally discover TCP services, and export structured findings to **HTML, Markdown, and JSON**.
 
-[Getting started](#-quick-start) · [Documentation](#-documentation) · [Architecture](#-architecture) · [Security model](#-authorization--safety) · [Roadmap](#-roadmap)
+[Getting started](#quick-start) · [Documentation](#documentation) · [Architecture](docs/architecture.md) · [Security model](#authorization--safety) · [Roadmap](#roadmap)
 
-<sub>v0.1.0 PROTOTYPE &nbsp;·&nbsp; WINDOWS / LINUX / MACOS* &nbsp;·&nbsp; NO CLOUD ACCOUNT &nbsp;·&nbsp; NO LLM</sub>
+<sub>v0.1.0 PROTOTYPE &nbsp;·&nbsp; GO 1.23+ &nbsp;·&nbsp; CROSS-PLATFORM SOURCE &nbsp;·&nbsp; NO CLOUD ACCOUNT &nbsp;·&nbsp; NO LLM</sub>
 
 </div>
 
