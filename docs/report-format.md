@@ -36,3 +36,21 @@ See [`samples/demo-report.json`](samples/demo-report.json) for a sanitized fixtu
 ## Privacy and stable use
 
 Do not publish reports about confidential project paths, hosts, or internal topology. The output folder is ignored by the repository's `.gitignore`; keep the same hygiene in downstream CI logs. The JSON structure is a prototype interface and may change before a stable release. Downstream consumers should tolerate unknown fields and missing optional properties.
+
+## Nmap integration fields (v0.2.0)
+
+When `--nmap` is requested, reports include a `nmap` object:
+
+```json
+{
+  "status": "completed",
+  "target": "127.0.0.1",
+  "mode": "TCP connect; 100 common ports; light service detection; low rate",
+  "version": "Nmap fixture 0.0.0 (test double)",
+  "duration_ms": 18,
+  "open_tcp_ports": 1,
+  "binary_source": "explicit override"
+}
+```
+
+This is a **synthetic sample**, not a live network scan. Values are illustrative. `status` may also be `skipped` or `failed`, and a completed scan with no open ports does not establish absence of vulnerabilities.

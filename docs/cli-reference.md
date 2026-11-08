@@ -50,3 +50,13 @@ A successful scan prints file count, counts by severity, warnings, and paths to 
 ## Explicit non-features
 
 No arbitrary-command chat, shell passthrough, automatic exploit execution, password attacks, stealth scanning, port-range input, crawling, vulnerability confirmation, cloud-agent connection, or AI-based decisions are implemented.
+
+## New in 0.2.0 — Nmap health and explicit executable path
+
+`secubrain doctor` (or `tools`) checks available runtime tools without scanning any network target. It returns the detected user-installed Nmap binary, version, and discovery method when present, or the official independent download page when absent. A missing optional tool is not fatal for local project auditing.
+
+`secubrain scan --url https://authorized.example --authorized --nmap` enables bounded Nmap TCP connect / light service inspection. `--nmap-bin PATH` overrides Nmap discovery. `SECUBRAIN_NMAP_PATH` is another optional override. A provided explicit path that does not exist fails clearly instead of silently falling back.
+
+The CLI uses ANSI colors and a brief banner animation only on an interactive supported terminal. `NO_COLOR=1` or `SECUBRAIN_PLAIN=1` disables ANSI. `SECUBRAIN_NO_ANIM=1` disables animation. Non-interactive runs fall back to plain output.
+
+For Nmap parameters, safety bounds and XML semantics, read [Nmap integration](nmap-integration.md).

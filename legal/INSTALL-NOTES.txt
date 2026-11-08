@@ -1,0 +1,44 @@
+SECUBRAIN 0.2.0 / BEFORE INSTALLATION
+=======================================
+
+Thank you for choosing SecuBrain.
+
+SecuBrain is a local-first command-line application written in Go for
+non-destructive security checks on projects and explicitly authorized sites.
+
+HOW THE INSTALLATION WORKS
+--------------------------
+1. Review the full installation and acceptable-use agreement.
+2. Choose an installation folder (default: your local user programs folder).
+3. Optionally enable a desktop shortcut and add SecuBrain to your user PATH.
+4. Review the Nmap integration page. Nmap is NOT included in SecuBrain.
+5. Confirm installation; the installer shows actual file installation progress.
+6. Launch SecuBrain and run `doctor` to check available tools.
+
+NMAP THIRD-PARTY DEPENDENCY
+---------------------------
+SecuBrain does NOT bundle, download automatically, or silently install Nmap
+or Npcap. These products are subject to licenses established by their owners.
+The installer provides a direct link to the official Nmap download page:
+https://nmap.org/download.html
+
+Once independently installed, SecuBrain detects Nmap from PATH and common
+Windows installation directories. You can also specify --nmap-bin.
+
+AFTER INSTALLATION
+------------------
+Open the 'SecuBrain CLI' Start Menu shortcut and type:
+    help
+    doctor
+    scan --path "C:\path\to\my-project"
+
+For network checks on a domain you are expressly authorized to inspect:
+    scan --url https://example.org --authorized --nmap
+
+Your reports are written to a local folder; no AI service is involved.
+The software does not verify ownership of an entered address, so the
+operator must independently confirm permission before every remote audit.
+
+TECHNICAL SUPPORT
+-----------------
+https://github.com/twofern2ndes/SecuBrain/issues

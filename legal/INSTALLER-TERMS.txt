@@ -1,0 +1,183 @@
+SECUBRAIN SOFTWARE INSTALLATION AND ACCEPTABLE-USE AGREEMENT
+Version 0.2.0 (prototype) -- November 2026
+
+PLEASE READ THIS AGREEMENT CAREFULLY. SELECT "I ACCEPT THE AGREEMENT" ONLY
+IF YOU UNDERSTAND THE CONDITIONS BELOW. IF YOU DO NOT ACCEPT THEM, SELECT
+"I DO NOT ACCEPT THE AGREEMENT" AND EXIT THE INSTALLER.
+
+1. DESCRIPTION AND PURPOSE
+
+SecuBrain is a security auditing prototype and developer-oriented CLI.
+The project is designed to support learning, internal code review,
+defensive engineering, authorized security assessments, and professional
+review of systems by their owners or authorized administrators. It performs
+bounded, deterministic checks and produces locally stored reports.
+SecuBrain is not an autonomous exploitation framework, does not contain
+an artificial intelligence engine, and does not attempt to replace a
+qualified human security assessment.
+
+2. AUTHORIZED USE ONLY
+
+You are solely responsible for ensuring that you are legally entitled to
+test each target. You must have ownership or explicit, verifiable permission
+from the system owner and must remain within the approved written scope.
+Do not use this software to access, disrupt, damage, enumerate, inspect,
+or attempt to obtain information from any system without authorization.
+Permission for a web address does not automatically authorize every host,
+subdomain, account, network or service associated with that address.
+
+3. NETWORK AND SERVICE CHECKS
+
+Network scanning generates real network traffic. Even scans configured
+with low packet rates can trigger intrusion-detection controls, audit
+alerts, rate limits, performance impacts or unintended behavior on
+fragile equipment. Always schedule tests, inform the responsible system
+owner, use an approved change window where appropriate, and establish
+procedures for stopping a scan safely. SecuBrain's --authorized option
+records the operator's assertion; it does not independently verify legal
+permission or ownership.
+
+4. SCOPE AND OPERATOR RESPONSIBILITY
+
+You agree to enter only specifically authorized targets, to respect
+privacy and third-party systems, and to comply with applicable laws,
+contracts, policies, professional ethics, and institutional requirements.
+You are responsible for any further action taken based on findings. A
+finding in a generated report is an automated indicator and may be
+inaccurate, incomplete or a false positive. Open ports and service
+banners are not, by themselves, proof of a security vulnerability.
+
+5. THIRD-PARTY TECHNOLOGIES -- NMAP AND NPCAP
+
+Nmap and Npcap are independent products, are not developed by the SecuBrain
+project, and are not included in this installer. This installer does not
+automatically download or redistribute them. Nmap is offered under the
+Nmap Public Source License and Npcap under its own license. Obtain them
+separately from their official distributors and review the third-party
+license and installer agreements before installing them. The ability to
+interoperate with a separately installed program does not imply an
+affiliation, endorsement, redistribution permission or shared warranty.
+Official Nmap website: https://nmap.org/ .
+
+6. INSTALLATION, PATH CHANGES AND UNINSTALLATION
+
+The setup program installs SecuBrain in a directory selected by the user.
+If selected, it can add that directory to your user PATH for convenient
+command-line access, and it can create Start Menu or desktop shortcuts.
+It does not request administrator privileges for the default user-level
+installation. The uninstaller removes SecuBrain files installed by Setup
+and the specific SecuBrain PATH entry when present. Separately installed
+Nmap, Npcap, and files the operator has created are not part of SecuBrain's
+uninstallation process.
+
+7. OUTPUT, DATA AND PRIVACY
+
+SecuBrain can read local files in the directory you provide and may write
+security findings, filesystem paths, URL hostnames, timestamps, service
+information and potential indicators to local reports. Reports are not
+automatically sent to a cloud AI provider. Protect reports with appropriate
+filesystem permissions, access controls and retention policies. Although
+SecuBrain attempts to avoid disclosing detected credentials, no automated
+redaction is perfect. Review reports before sharing or publishing them.
+
+8. NO SECURITY GUARANTEE
+
+SecuBrain does not perform a comprehensive penetration test. A successful
+scan, the absence of findings, or a report labeled "completed" does not
+establish that a system is secure, compliant, hardened, or free from
+vulnerabilities. Service detection and classifications may be erroneous.
+Human review and independent validation remain necessary.
+
+9. EXPERIMENTAL STATUS
+
+This is an evolving prototype. Features, data schemas, detection rules,
+installer integration, command-line flags and output formats may change
+between versions. The project has automated tests, but no amount of
+testing ensures compatibility with every machine or environment. No
+promise is made that all Windows configurations, security policies,
+endpoint-protection products or external Nmap installations will work.
+
+10. NO MISUSE OR CRIMINAL OBJECTIVE
+
+The project is intended for defensive, educational, research, enterprise,
+and professional security-review purposes. It is not developed or
+distributed for unauthorized access, theft of data, extortion, disruption,
+credential attacks or other unlawful activity. The project maintainers
+expressly discourage misuse and ask users to report responsibly discovered
+problems through the project's security policy.
+
+11. NO WARRANTY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, SECUBRAIN IS PROVIDED
+"AS IS" AND "AS AVAILABLE," WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, NON-INFRINGEMENT, PERFORMANCE, ACCURACY, RELIABILITY,
+SECURITY, ERROR-FREE OPERATION OR CONTINUOUS AVAILABILITY. YOU ASSUME THE
+RISKS ASSOCIATED WITH INSTALLING AND OPERATING THE SOFTWARE.
+
+12. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE PROJECT AUTHORS,
+MAINTAINERS, CONTRIBUTORS AND DISTRIBUTORS ARE NOT RESPONSIBLE FOR MISUSE
+OF THE SOFTWARE BY OPERATORS OR THIRD PARTIES, OR FOR LOSSES ARISING FROM
+UNAUTHORIZED SCANNING, SERVICE INTERRUPTION, INACCURATE REPORTS, OR
+IMPROPER HANDLING OF THE INFORMATION GENERATED. THEY SHALL NOT BE LIABLE
+FOR INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL OR PUNITIVE
+DAMAGES, OR FOR LOSS OF DATA, REVENUE, USE, REPUTATION OR BUSINESS.
+NOTHING IN THIS AGREEMENT EXCLUDES LIABILITY THAT CANNOT LAWFULLY BE
+EXCLUDED IN YOUR JURISDICTION.
+
+13. PROFESSIONAL DUTY OF CARE
+
+A company or professional using this software must establish its own
+assessment authorization process, incident-handling procedures, backup
+policies, responsible disclosure practices, verification of critical
+findings and independent evaluation of operational risk. SecuBrain's
+reports are an aid to judgment, not a substitute for qualified expertise.
+
+14. SOURCE CODE AND PROJECT IDENTITY
+
+The first-party SecuBrain application is implemented as a dedicated Go
+project and is tested using its published test suite and CI workflows.
+This description does not represent a certification, independent audit,
+or guarantee of exhaustive testing. The repository may contain
+third-party references, independently licensed tools and user-contributed
+changes. Source availability alone does not override third-party rights
+or grant permission to redistribute external dependencies.
+
+15. INTELLECTUAL PROPERTY AND SEPARATE LICENSES
+
+This text describes the conditions for installing this prototype and the
+rules of authorized operation; it is not a grant of rights to third-party
+software. Any separate licensing terms that the maintainers publish for
+SecuBrain source code must be reviewed independently. Nmap and Npcap are
+not sublicensed by SecuBrain under this agreement.
+
+16. REPORTING SECURITY ISSUES
+
+Do not disclose working exploit details against live third-party systems
+through public issues. See SECURITY.md in the project repository for
+responsible reporting guidance. If you believe an audit caused unintended
+impact, stop immediately, preserve evidence, and contact the target owner.
+
+17. THIRD-PARTY AFFILIATION
+
+SecuBrain is an independent project and is not affiliated with, sponsored
+by or endorsed by the Nmap Project, the Npcap Project or the companies
+behind them. References to their names are factual descriptions of
+optional compatibility and do not imply certification or endorsement.
+
+18. ENTIRE NOTICE AND LEGAL LIMITATIONS
+
+This agreement is a project-specific installation and acceptable-use notice,
+not legal advice. Its enforceability and effect may vary by jurisdiction.
+It cannot replace applicable law, contractual authorization requirements
+or binding third-party licensing terms. If any clause is invalid, the
+remaining valid clauses continue to express the project's intended terms
+to the extent legally permissible.
+
+BY ACCEPTING, YOU ACKNOWLEDGE THAT YOU HAVE READ THE TERMS, UNDERSTAND
+THE SCOPED AND NON-DESTRUCTIVE PURPOSE OF SECUBRAIN, AND AGREE TO USE IT
+ONLY IN ENVIRONMENTS WHERE YOU ARE AUTHORIZED TO DO SO.
+
+Project: https://github.com/twofern2ndes/SecuBrain

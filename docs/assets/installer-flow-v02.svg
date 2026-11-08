@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="525" viewBox="0 0 1080 525" role="img" aria-label="Documented SecuBrain installer wizard flow">
+<rect width="100%" height="100%" rx="14" fill="#0c1016"/>
+<text x="45" y="60" fill="#e8eef5" font-family="DejaVu Sans,Arial" font-size="27" font-weight="bold">WINDOWS SETUP / INSTALLATION FLOW</text>
+<text x="45" y="88" fill="#93a5b8" font-family="DejaVu Sans,Arial" font-size="14">Documentation diagram · Inno Setup wizard · Nmap/Npcap separate</text>
+<rect x="45" y="125" width="473" height="105" rx="8" fill="#151d27" stroke="#334153"/>
+<text x="67" y="160" fill="#91b2d4" font-family="DejaVu Sans Mono,Consolas,monospace" font-size="18">01 / WELCOME</text>
+<text x="67" y="192" fill="#bac6d4" font-family="DejaVu Sans,Arial" font-size="13">SecuBrain v0.2.0 / publisher details</text>
+<rect x="545" y="125" width="473" height="105" rx="8" fill="#151d27" stroke="#334153"/>
+<text x="567" y="160" fill="#91b2d4" font-family="DejaVu Sans Mono,Consolas,monospace" font-size="18">02 / AGREEMENT</text>
+<text x="567" y="192" fill="#bac6d4" font-family="DejaVu Sans,Arial" font-size="13">Read complete terms; Accept or Decline</text>
+<rect x="45" y="249" width="473" height="105" rx="8" fill="#151d27" stroke="#334153"/>
+<text x="67" y="284" fill="#91b2d4" font-family="DejaVu Sans Mono,Consolas,monospace" font-size="18">03 / OPTIONS</text>
+<text x="67" y="316" fill="#bac6d4" font-family="DejaVu Sans,Arial" font-size="13">Destination / desktop shortcut / user PATH</text>
+<rect x="545" y="249" width="473" height="105" rx="8" fill="#151d27" stroke="#334153"/>
+<text x="567" y="284" fill="#91b2d4" font-family="DejaVu Sans Mono,Consolas,monospace" font-size="18">04 / NMAP</text>
+<text x="567" y="316" fill="#bac6d4" font-family="DejaVu Sans,Arial" font-size="13">Separate official download; not bundled</text>
+<rect x="45" y="373" width="473" height="105" rx="8" fill="#151d27" stroke="#334153"/>
+<text x="67" y="408" fill="#91b2d4" font-family="DejaVu Sans Mono,Consolas,monospace" font-size="18">05 / INSTALL</text>
+<text x="67" y="440" fill="#bac6d4" font-family="DejaVu Sans,Arial" font-size="13">Real Windows Setup progress and file copy</text>
+<rect x="545" y="373" width="473" height="105" rx="8" fill="#151d27" stroke="#334153"/>
+<text x="567" y="408" fill="#91b2d4" font-family="DejaVu Sans Mono,Consolas,monospace" font-size="18">06 / COMPLETE</text>
+<text x="567" y="440" fill="#bac6d4" font-family="DejaVu Sans,Arial" font-size="13">Start Menu shortcut / CLI doctor / uninstall</text>
+</svg>

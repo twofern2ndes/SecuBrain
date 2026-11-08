@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="510" viewBox="0 0 1080 510" role="img" aria-label="SECUBRAIN / NMAP PARSER TEST DOUBLE / v0.2.0">
+<rect width="100%" height="100%" fill="#0b0f15" rx="15"/>
+<rect x="1" y="1" width="1078" height="508" fill="none" stroke="#303945" rx="14"/>
+<path d="M0 55 H1080" stroke="#303945"/>
+<circle cx="26" cy="28" r="6" fill="#7f6870"/><circle cx="48" cy="28" r="6" fill="#8d8567"/><circle cx="70" cy="28" r="6" fill="#5e817b"/>
+<text x="100" y="34" fill="#9facbd" font-size="14" font-family="DejaVu Sans Mono,Consolas,monospace">SECUBRAIN / NMAP PARSER TEST DOUBLE / v0.2.0</text>
+<text x="35" y="86" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">OFFLINE TEST FIXTURE / FAKE NMAP / NOT A LIVE SCAN</text>
+<text x="35" y="138" fill="#89aaca" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">· Checking HTTP response headers (no crawling)...</text>
+<text x="35" y="164" fill="#89aaca" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  · Checking common TCP ports with Nmap...</text>
+<text x="35" y="190" fill="#89aaca" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  · Writing HTML, Markdown and JSON reports...</text>
+<text x="35" y="242" fill="#edf1f8" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  AUDIT / COMPLETE</text>
+<text x="35" y="268" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  ────────────────────────────────────────────────</text>
+<text x="35" y="294" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  Files             0</text>
+<text x="35" y="320" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  Indicators        0 high / 0 medium / 0 low / 3 info</text>
+<text x="35" y="346" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  Nmap              completed · 1 open TCP ports</text>
+<text x="35" y="372" fill="#9bdbb9" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  ✓ Reports written</text>
+<text x="35" y="398" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  HTML              /mnt/data/secubrain/dist/fixture-report/report.html</text>
+<text x="35" y="424" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  JSON              /mnt/data/secubrain/dist/fixture-report/report.json</text>
+<text x="35" y="450" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  Markdown          /mnt/data/secubrain/dist/fixture-report/report.md</text>
+</svg>

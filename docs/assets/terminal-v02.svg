@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="666" viewBox="0 0 1080 666" role="img" aria-label="SECUBRAIN / INTERACTIVE CLI / v0.2.0">
+<rect width="100%" height="100%" fill="#0b0f15" rx="15"/>
+<rect x="1" y="1" width="1078" height="664" fill="none" stroke="#303945" rx="14"/>
+<path d="M0 55 H1080" stroke="#303945"/>
+<circle cx="26" cy="28" r="6" fill="#7f6870"/><circle cx="48" cy="28" r="6" fill="#8d8567"/><circle cx="70" cy="28" r="6" fill="#5e817b"/>
+<text x="100" y="34" fill="#9facbd" font-size="14" font-family="DejaVu Sans Mono,Consolas,monospace">SECUBRAIN / INTERACTIVE CLI / v0.2.0</text>
+<text x="35" y="86" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</text>
+<text x="35" y="112" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">   ┃                                                    ┃</text>
+<text x="35" y="138" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">   ┃  S E C U B R A I N                           v0.2.0 ┃</text>
+<text x="35" y="164" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">   ┃  SECURITY ENGINEERING / DETERMINISTIC AUDITING     ┃</text>
+<text x="35" y="190" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">   ┃                                                    ┃</text>
+<text x="35" y="216" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</text>
+<text x="35" y="268" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">   Local-first  ·  No AI  ·  Authorized assessments only</text>
+<text x="35" y="294" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">   Type help for commands, doctor to inspect dependencies.</text>
+<text x="35" y="346" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  secubrain / › </text>
+<text x="35" y="372" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  SYSTEM / DEPENDENCY CHECK</text>
+<text x="35" y="398" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  ────────────────────────────────────────────────</text>
+<text x="35" y="424" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  SecuBrain         0.2.0 · Go standard library</text>
+<text x="35" y="450" fill="#9bdbb9" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  ✓ No AI model or online service required for local audits</text>
+<text x="35" y="476" fill="#f2c88e" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  ! Nmap: unavailable (optional)</text>
+<text x="35" y="502" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  Official download https://nmap.org/download.html</text>
+<text x="35" y="528" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  Note              Install Nmap independently, then run doctor again</text>
+<text x="35" y="580" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  secubrain / › SecuBrain 0.2.0</text>
+<text x="35" y="606" fill="#c9d3df" xml:space="preserve" font-size="16" font-family="DejaVu Sans Mono,Consolas,monospace">  secubrain / ›</text>
+</svg>

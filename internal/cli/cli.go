@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/twofern2ndes/SecuBrain/internal/audit"
+	"github.com/twofern2ndes/SecuBrain/internal/ui"
 )
 
 func Run(args []string) int {
@@ -22,6 +23,8 @@ func Run(args []string) int {
 	switch args[0] {
 	case "scan":
 		return scan(args[1:])
+	case "doctor", "tools":
+		return doctor(args[1:])
 	case "help", "--help", "-h":
 		usage()
 		return 0
@@ -36,28 +39,58 @@ func Run(args []string) int {
 }
 
 func usage() {
-	fmt.Printf(`SECUBRAIN v%s — deterministic security auditor (no AI)
+	fmt.Printf(`SECUBRAIN v%s — local-first security auditor (no AI)
 
 Usage:
-  secubrain                         Start interactive terminal
-  secubrain scan --path ./project   Audit local source and configuration
-  secubrain scan --path . --out ./reports
+  secubrain                                     Launch interactive CLI
+  secubrain doctor                              Check external tools and prerequisites
+  secubrain scan --path ./project               Audit local project
   secubrain scan --url https://example.org --authorized
   secubrain scan --url https://example.org --authorized --nmap
+  secubrain scan --url https://example.org --authorized --nmap --nmap-bin /usr/bin/nmap
   secubrain version
 
-Options for scan:
-  --path        Project directory (optional with --url)
-  --url         Explicitly authorized http(s) endpoint
-  --authorized  Assert permission for web/network checks (required with --url)
-  --nmap        Optional limited common-port discovery (requires installed Nmap)
-  --out         Report directory (default: ./secubrain-reports)
-  --max-files   File count limit (default: 5000)
-  --timeout     Web request timeout (default: 8s)
+Scan flags:
+  --path        Local project directory (may be supplied positionally)
+  --url         Explicitly authorized HTTP(S) endpoint
+  --authorized  Mandatory assertion of permission for remote checks
+  --nmap        Enable bounded, low-rate Nmap TCP service discovery
+  --nmap-bin    Explicit path to user-installed Nmap (optional)
+  --out         Output folder (default: ./secubrain-reports)
+  --max-files   File limit (default 5000)
+  --timeout     HTTP request timeout (default: 8s)
 
+Nmap is a separately installed third-party tool and is NOT bundled.
 Reports: report.html, report.md, report.json
-No brute-force, exploitation, web crawling, or AI actions.
+Never scan systems without authorization. No exploitation or brute-force.
 `, audit.Version)
+}
+
+func doctor(args []string) int {
+	fs := flag.NewFlagSet("doctor", flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	var nmapBinary string
+	fs.StringVar(&nmapBinary, "nmap-bin", "", "path to installed Nmap")
+	if err := fs.Parse(args); err != nil || fs.NArg() != 0 {
+		return 2
+	}
+	term := ui.New(os.Stdout)
+	term.Heading("SYSTEM / DEPENDENCY CHECK")
+	term.KeyValue("SecuBrain", audit.Version+" · Go standard library")
+	term.Success("No AI model or online service required for local audits")
+	status, err := audit.DetectNmap(context.Background(), nmapBinary)
+	if err != nil {
+		term.Warn("Nmap: unavailable (optional)")
+		term.KeyValue("Official download", "https://nmap.org/download.html")
+		term.KeyValue("Note", "Install Nmap independently, then run doctor again")
+	} else {
+		term.Success("Nmap detected")
+		term.KeyValue("Version", status.Version)
+		term.KeyValue("Binary", status.Binary)
+		term.KeyValue("Discovery", status.Source)
+	}
+	fmt.Println()
+	return 0
 }
 
 func scan(args []string) int {
@@ -68,7 +101,8 @@ func scan(args []string) int {
 	fs.StringVar(&cfg.URL, "url", "", "authorized web URL")
 	fs.StringVar(&cfg.Output, "out", "secubrain-reports", "output directory")
 	fs.BoolVar(&cfg.Authorized, "authorized", false, "assert authorization for network checks")
-	fs.BoolVar(&cfg.Nmap, "nmap", false, "enable optional Nmap common-port discovery")
+	fs.BoolVar(&cfg.Nmap, "nmap", false, "enable optional bounded Nmap service discovery")
+	fs.StringVar(&cfg.NmapBinary, "nmap-bin", "", "path to Nmap executable")
 	fs.IntVar(&cfg.MaxFiles, "max-files", 5000, "maximum files to inspect")
 	fs.DurationVar(&cfg.Timeout, "timeout", 8*time.Second, "network timeout")
 	if err := fs.Parse(movePositionals(args)); err != nil {
@@ -85,28 +119,35 @@ func scan(args []string) int {
 		}
 		cfg.Path = fs.Arg(0)
 	}
-	report, err := audit.Run(context.Background(), cfg, func(s string) { fmt.Println("[>]", s) })
+	term := ui.New(os.Stdout)
+	report, err := audit.Run(context.Background(), cfg, term.Step)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "[ERROR]", err)
+		term.Error(err.Error())
 		return 1
 	}
 	output, _ := filepath.Abs(cfg.Output)
-	fmt.Printf("\n[OK] Inspected %d files. Findings: %d high / %d medium / %d low / %d info\n", report.Stats.FilesInspected, report.Stats.High, report.Stats.Medium, report.Stats.Low, report.Stats.Info)
+	term.Heading("AUDIT / COMPLETE")
+	term.KeyValue("Files", fmt.Sprint(report.Stats.FilesInspected))
+	term.KeyValue("Indicators", fmt.Sprintf("%d high / %d medium / %d low / %d info", report.Stats.High, report.Stats.Medium, report.Stats.Low, report.Stats.Info))
+	if report.Nmap != nil {
+		term.KeyValue("Nmap", fmt.Sprintf("%s · %d open TCP ports", report.Nmap.Status, report.Nmap.OpenTCPPorts))
+	}
 	if len(report.Warnings) > 0 {
 		for _, w := range report.Warnings {
-			fmt.Println("[!]", w)
+			term.Warn(w)
 		}
 	}
-	fmt.Println("[OK] Report:", filepath.Join(output, "report.html"))
-	fmt.Println("[OK] JSON:  ", filepath.Join(output, "report.json"))
-	fmt.Println("[OK] Markdown:", filepath.Join(output, "report.md"))
+	term.Success("Reports written")
+	term.KeyValue("HTML", filepath.Join(output, "report.html"))
+	term.KeyValue("JSON", filepath.Join(output, "report.json"))
+	term.KeyValue("Markdown", filepath.Join(output, "report.md"))
 	return 0
 }
 
 // Accepts a single path before or after flags, including: scan ./project --out ./report.
 func movePositionals(args []string) []string {
 	var flags, positions []string
-	takesValue := map[string]bool{"--path": true, "--url": true, "--out": true, "--max-files": true, "--timeout": true}
+	takesValue := map[string]bool{"--path": true, "--url": true, "--out": true, "--max-files": true, "--timeout": true, "--nmap-bin": true}
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
 		if strings.HasPrefix(arg, "-") {
@@ -123,11 +164,12 @@ func movePositionals(args []string) []string {
 }
 
 func repl() int {
-	fmt.Printf("SECUBRAIN / v%s\nDeterministic audits · No AI · Authorized targets only\nType 'help' for commands.\n\n", audit.Version)
+	term := ui.New(os.Stdout)
+	term.Banner(audit.Version)
 	scanner := bufio.NewScanner(os.Stdin)
 	lastReport := ""
 	for {
-		fmt.Print("secubrain > ")
+		term.Prompt()
 		if !scanner.Scan() {
 			break
 		}
@@ -150,6 +192,8 @@ func repl() int {
 			usage()
 		case "version":
 			fmt.Println("SecuBrain", audit.Version)
+		case "doctor", "tools":
+			doctor(parts[1:])
 		case "status":
 			if lastReport == "" {
 				fmt.Println("No scan launched in this session.")
@@ -162,7 +206,7 @@ func repl() int {
 				lastReport = filepath.Join(out, "report.html")
 			}
 		default:
-			fmt.Println("Unknown command. Use: scan, status, help, version, exit")
+			term.Warn("Unknown command. Use: scan, doctor, status, help, version, exit")
 		}
 	}
 	if err := scanner.Err(); err != nil && !errors.Is(err, io.EOF) {

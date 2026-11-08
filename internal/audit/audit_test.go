@@ -113,11 +113,17 @@ func TestURLValidation(t *testing.T) {
 
 func TestParseNmapOutput(t *testing.T) {
 	xmlText := []byte(`<?xml version="1.0"?><nmaprun><host><ports><port protocol="tcp" portid="443"><state state="open"/><service name="https"/></port><port protocol="tcp" portid="22"><state state="closed"/></port></ports></host></nmaprun>`)
-	items := parseNmapOutput(xmlText, "example.test")
+	items, err := parseNmapOutput(xmlText, "example.test")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(items) != 1 || items[0].Severity != "info" || items[0].Location != "example.test:443" {
 		t.Fatalf("unexpected port findings: %+v", items)
 	}
-	noOpen := parseNmapOutput([]byte(`<nmaprun><host><ports></ports></host></nmaprun>`), "example.test")
+	noOpen, err := parseNmapOutput([]byte(`<nmaprun><host><ports></ports></host></nmaprun>`), "example.test")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if noOpen == nil {
 		t.Fatal("valid XML with zero ports must not be treated as parse failure")
 	}

@@ -6,9 +6,9 @@
 
 <p align="center">Analyze a local codebase, inspect approved HTTP endpoints, optionally discover TCP services,<br>and export structured findings to <strong>HTML, Markdown, and JSON</strong>.</p>
 
-<p align="center"><a href="#quick-start">Getting started</a> · <a href="#documentation">Documentation</a> · <a href="docs/architecture.md">Architecture</a> · <a href="#authorization--safety">Security model</a> · <a href="#roadmap">Roadmap</a></p>
+<p align="center"><a href="https://github.com/twofern2ndes/SecuBrain/releases/tag/v0.2.0">Windows download</a> · <a href="#quick-start">Getting started</a> · <a href="#documentation">Documentation</a> · <a href="docs/architecture.md">Architecture</a> · <a href="#authorization--safety">Security model</a> · <a href="#roadmap">Roadmap</a></p>
 
-<p align="center"><sub>v0.1.0 PROTOTYPE &nbsp;·&nbsp; GO 1.23+ &nbsp;·&nbsp; CROSS-PLATFORM SOURCE &nbsp;·&nbsp; NO CLOUD ACCOUNT &nbsp;·&nbsp; NO LLM</sub></p>
+<p align="center"><sub>v0.2.0 PROTOTYPE &nbsp;·&nbsp; GO 1.23+ &nbsp;·&nbsp; CROSS-PLATFORM SOURCE &nbsp;·&nbsp; NO CLOUD ACCOUNT &nbsp;·&nbsp; NO LLM</sub></p>
 
 ---
 
@@ -53,15 +53,27 @@ SecuBrain turns a few deliberate inputs into a reproducible audit workflow. Its 
 
 ## Screenshots & verified output
 
-The visuals below are **formatted captures of actual local test and CLI output**, generated using the included synthetic fixture on 8 Nov 2026. They are not depictions of a scan against a real production target.
+The visuals below are **formatted captures from reproducible tests and local CLI runs** using synthetic fixtures. They do not depict a scan against a real production target. The new network screenshot uses a **fake Nmap test executable**, not a live network probe.
 
 ### CLI — local fixture scan
 
 ![SecuBrain CLI showing two medium-severity findings in a synthetic demonstration project](docs/assets/cli-demo.svg)
 
-### Automated test suite
+### Automated test suite (v0.1 reference)
 
 ![Go test verbose output showing eight passing tests](docs/assets/test-suite.svg)
+
+### Interactive terminal / v0.2
+
+![SecuBrain v0.2 interactive terminal help and dependency check](docs/assets/terminal-v02.svg)
+
+### Nmap adapter / offline integration test
+
+![SecuBrain Nmap integration fake-process fixture showing a parsed open TCP port](docs/assets/nmap-fixture-v02.svg)
+
+### Windows installation process
+
+![SecuBrain Windows installer wizard page sequence and Nmap license boundary](docs/assets/installer-flow-v02.svg)
 
 ### Report overview
 
@@ -71,14 +83,16 @@ The corresponding sanitized, machine-readable example is in [`docs/samples/demo-
 
 ## Features at a glance
 
-| Component | Implemented in v0.1.0 | Behavior |
+| Component | Implemented in v0.2.0 | Behavior |
 |:--|:--:|:--|
-| Interactive terminal | Yes | `scan`, `help`, `status`, `version`, `exit` |
+| Interactive terminal | Yes | TTY-aware styled startup + optional short animation; `scan`, `doctor`, `help`, `status`, `version`, `exit` |
 | Local project audit | Yes | Recursive, bounded source/config inspection |
 | Potential exposed secrets | Yes | Pattern-based indicators; values are not echoed |
 | `.env` ignore review | Yes | Checks common `.gitignore` patterns for root `.env` |
 | Web hardening | Yes | Exactly one `HEAD` request per URL; redirects not followed |
-| Nmap integration | Optional | Limited TCP connect scan of one supplied hostname |
+| Nmap integration | Optional | Detects a separately installed Nmap, bounded TCP connect and light service discovery with parsed XML metadata |
+| Windows installer | Yes (x64) | Inno Setup wizard, full terms and Accept/Decline, install progress, user PATH option, shortcuts, uninstall |
+| Nmap bundled inside SecuBrain installer | **No** | Requires separate licensing permissions; official external Nmap download link provided |
 | Reports | Yes | HTML, Markdown, JSON |
 | External AI / API integration | No | Intentionally not used |
 | Metasploit / Hydra / exploitation | No | Not integrated |
@@ -98,7 +112,11 @@ The corresponding sanitized, machine-readable example is in [`docs/samples/demo-
 
 ### 2. Windows / PowerShell
 
-Once you have the Windows x64 executable from a trusted build or future release, save it as `secubrain.exe` in a working directory and run:
+**Recommended: use the guided Windows installer** from the [SecuBrain v0.2.0 prerelease](https://github.com/twofern2ndes/SecuBrain/releases/tag/v0.2.0). Download `SecuBrain-Setup-v0.2.0-windows-x64.exe`, verify the separately published SHA-256 checksum, read and accept the detailed installation terms, select optional PATH/shortcut integrations, and follow the native installation-progress wizard. **Nmap is not bundled**; the wizard offers a link to its independent official download page.
+
+See the detailed [Windows installer guide](docs/windows-installer.md) for the page-by-page installation process, licensing, uninstalling and troubleshooting.
+
+If you prefer the standalone Windows x64 CLI executable compiled from source, save it as `secubrain.exe` in a working directory and run:
 
 ```powershell
 .\secubrain.exe version
@@ -108,10 +126,11 @@ Once you have the Windows x64 executable from a trusted build or future release,
 Inside the interactive terminal:
 
 ```text
-secubrain > scan --path "C:\Projects\my-app"
-secubrain > status
-secubrain > help
-secubrain > exit
+  secubrain / › scan --path "C:\Projects\my-app"
+  secubrain / › doctor
+  secubrain / › status
+  secubrain / › help
+  secubrain / › exit
 ```
 
 Or run an audit directly:
@@ -121,7 +140,7 @@ Or run an audit directly:
 ```
 
 > [!NOTE]
-> An executable built locally is not necessarily signed. Prefer building from source or using a verified release. **This repository does not currently claim to provide signed binaries.**
+> **The Windows installer and CLI are not Authenticode-signed.** A GitHub Actions build and published SHA-256 hash are not the same as independent security certification. Review the source and verify the downloaded package; do not bypass endpoint protection blindly.
 
 ### 3. Build from source (any supported Go target)
 
@@ -157,16 +176,19 @@ Cross-compilation verifies the build process, **not runtime behavior on every op
 ./secubrain scan --path ./examples/demo-project --out ./secubrain-reports
 ```
 
-Expected result for the committed synthetic fixture (counts may change as detection rules evolve):
+Example v0.2 CLI output for the synthetic fixture:
 
 ```text
-[>] Inspecting project files...
-[>] Writing HTML, Markdown and JSON reports...
+  · Inspecting project files...
+  · Writing HTML, Markdown and JSON reports...
 
-[OK] Inspected 2 files. Findings: 0 high / 2 medium / 0 low / 0 info
-[OK] Report: .../secubrain-reports/report.html
-[OK] JSON:   .../secubrain-reports/report.json
-[OK] Markdown: .../secubrain-reports/report.md
+  AUDIT / COMPLETE
+  Files             2
+  Indicators        0 high / 2 medium / 0 low / 0 info
+  ✓ Reports written
+  HTML              .../secubrain-reports/report.html
+  JSON              .../secubrain-reports/report.json
+  Markdown          .../secubrain-reports/report.md
 ```
 
 ### 5. Inspect your own web endpoint
@@ -185,22 +207,33 @@ Combine local and network checks if both scopes are yours:
 ./secubrain scan --path ./my-app --url https://your-owned-host.example --authorized --out ./my-audit
 ```
 
-### 6. Optional: limited TCP discovery through Nmap
+### 6. Optional: real Nmap discovery, with separate installation
 
-Install Nmap separately and make sure `nmap` is available on your system's `PATH`:
+SecuBrain now has a **tested Nmap process adapter**: it detects a user-installed Nmap, runs a fixed argument allowlist, parses XML, records service names and best-effort product/version labels, records status and scan duration, and classifies open ports as informational findings. Its fake-Nmap integration tests exercise the complete adapter logic without sending network packets.
+
+**Nmap and Npcap are not included or silently downloaded.** Their upstream redistribution restrictions prevent us from shipping a combined public Windows package without suitable permissions. Install Nmap independently from [nmap.org/download.html](https://nmap.org/download.html) and review its upstream licenses.
 
 ```bash
-nmap --version
-./secubrain scan --url https://your-owned-host.example --authorized --nmap
+secubrain doctor
+secubrain scan --url https://your-owned-host.example --authorized --nmap
 ```
 
-The adapter uses a single hostname extracted from the URL and executes Nmap **without a shell** using the argument array:
+For nonstandard Nmap installation paths:
+
+```powershell
+secubrain doctor --nmap-bin "C:\Tools\Nmap\nmap.exe"
+secubrain scan --url https://your-owned-host.example --authorized --nmap --nmap-bin "C:\Tools\Nmap\nmap.exe"
+```
+
+The Go engine invokes `exec.CommandContext` **without a shell** using this fixed set of arguments:
 
 ```text
--sT -Pn -F -T2 --max-retries 1 --host-timeout 30s -oX - <hostname>
+-sT -sV --version-light -Pn -F -T2 --max-rate 25 --max-retries 1 --host-timeout 80s --open -oX - <hostname>
 ```
 
-This is a **bounded TCP connect scan of Nmap's fast/common ports**, not a vulnerability exploit or an exhaustive service inventory. A missing Nmap executable produces a warning and the rest of the audit can still run. The adapter has not been validated against every Nmap installation or network setup.
+Scans are limited to a single explicitly authorized host, Nmap's fast/common TCP ports, modest service detection, capped rate and bounded runtime. **No NSE scripts, OS exploitation, brute force or arbitrary Nmap flags.** Results are observations, not proof of exploitability. Tool errors are warnings, never fabricated scan results.
+
+The precise adapter design and license references are documented in [docs/nmap-integration.md](docs/nmap-integration.md).
 
 ## CLI reference
 
@@ -208,10 +241,12 @@ This is a **bounded TCP connect scan of Nmap's fast/common ports**, not a vulner
 |:--|:--|:--|
 | `secubrain` | Start interactive terminal | — |
 | `secubrain scan` | Run audit pipeline | — |
+| `secubrain doctor` / `tools` | Detect optional Nmap and report environment prerequisites | — |
 | `--path PATH` | Local folder to analyze | Optional when URL provided |
 | `--url URL` | Exact authorized HTTP(S) endpoint | None |
 | `--authorized` | Assert permission for remote checks | `false` |
-| `--nmap` | Enable optional Nmap port discovery | `false` |
+| `--nmap` | Enable optional bounded Nmap TCP and light service discovery | `false` |
+| `--nmap-bin FILE` | Override location of separately installed Nmap executable | Automatic discovery |
 | `--out DIR` | Set report output directory | `./secubrain-reports` |
 | `--max-files N` | Cap inspected file count | `5000` (max `50000`) |
 | `--timeout DURATION` | HTTP request timeout | `8s` (max `60s`) |
@@ -247,7 +282,7 @@ Raw secret values are **not** placed in findings or rendered output. This is **p
 ### Phase 3 — Web and Nmap adapters (opt-in)
 
 - **Web:** sends a single `HEAD` to the supplied URL, does not follow redirect destinations, uses normal TLS verification, and advises about certain headers (`HSTS`, `X-Content-Type-Options`, `Content-Security-Policy`, frame restrictions) and plaintext HTTP usage where relevant.
-- **Nmap:** optional subprocess with fixed arguments, XML output parsing, host-timeout bound, and open TCP ports reported as informational observations.
+- **Nmap:** optional subprocess with strictly fixed arguments, XML output parsing, fixed rate/time bounds, best-effort service metadata and open TCP ports reported as informational observations. Its adapter test uses a fake Nmap executable, not an unauthorized live target.
 
 ### Phase 4 — Correlation, prioritization, reporting
 
@@ -264,7 +299,7 @@ secubrain-reports/
 └── report.json     # Structured automation-friendly result
 ```
 
-Each finding includes an identifier, severity, category, title, description, redacted evidence, source location/line when available, and a recommendation. The JSON also includes scan timestamps, tool version, performed checks, warnings, and statistics.
+Each finding includes an identifier, severity, category, title, description, redacted evidence, source location/line when available, and a recommendation. The JSON also includes scan timestamps, tool version, performed checks, warnings, and statistics. When Nmap is enabled, a `nmap` object summarizes its execution state (`completed`, `skipped`, `failed`), selected target, mode, version, duration and observed open TCP ports.
 
 Example (abbreviated; no genuine secrets):
 
@@ -301,7 +336,8 @@ The project's design boundaries and disclosure process are described in [`docs/s
 SecuBrain/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                 # Automated Go verification
+│       ├── ci.yml                  # Automated Go verification
+│       └── windows-installer.yml   # Native installer build + smoke test + release
 ├── cmd/
 │   └── secubrain/
 │       └── main.go                # Executable entry point
@@ -313,9 +349,10 @@ SecuBrain/
 │   │   ├── nmap.go                # Optional bounded Nmap adapter
 │   │   ├── reports.go             # HTML, Markdown and JSON output
 │   │   └── audit_test.go          # Auditing/safety tests
-│   └── cli/
-│       ├── cli.go                 # CLI & interactive commands
-│       └── cli_test.go            # Command parsing tests
+│   ├── cli/
+│   │   ├── cli.go                  # CLI and interactive commands
+│   │   └── cli_test.go             # Command parsing tests
+│   └── ui/                         # Terminal styling and Windows ANSI handling
 ├── docs/
 │   ├── assets/                     # Test-output visuals (SVG)
 │   ├── make_assets.py              # Rebuild documentation diagrams
@@ -324,10 +361,15 @@ SecuBrain/
 │   ├── cli-reference.md
 │   ├── report-format.md
 │   ├── security-model.md
-│   └── development.md
+│   ├── development.md
+│   ├── windows-installer.md
+│   ├── nmap-integration.md
+│   └── release-notes/            # Release changelogs
 ├── examples/
 │   ├── README.md
 │   └── demo-project/              # Synthetic test fixture
+├── installer/                      # Inno Setup wizard and iconography
+├── legal/                          # Install terms and safety notices
 ├── .gitignore
 ├── CONTRIBUTING.md
 ├── SECURITY.md
@@ -345,7 +387,7 @@ go vet ./...
 go test -race ./...    # Where the Go race detector is supported
 ```
 
-The v0.1 suite currently has **8 passing tests** covering secret-value redaction, authorization gating, HTTP `HEAD` behavior, redirect isolation, URL validation, Nmap XML parsing, HTML escaping, and command-line parsing.
+The v0.2 suite contains **15 tests** including secret-value redaction, authorization gating, HTTP `HEAD` isolation, redirect isolation, URL validation, Nmap XML and test-double process integration, HTML escaping, missing-tool handling, fixed-argument protection and CLI parsing. The GitHub Actions Windows installer job additionally compiles setup and tests install/uninstall behavior.
 
 A local test pass is a snapshot, not a claim of production readiness. See [`docs/development.md`](docs/development.md) for reproducible steps.
 
@@ -353,8 +395,9 @@ A local test pass is a snapshot, not a claim of production readiness. See [`docs
 
 | Stage | Goal | Status |
 |:--|:--|:--|
-| 0.1 | Deterministic CLI, bounded local scanning, web headers, optional Nmap, 3 report formats | **Current prototype** |
-| 0.2 | Better rules and language-aware static analysis; richer configuration | Planned |
+| 0.1 | Deterministic CLI, bounded local scanning, web headers, initial Nmap adapter, 3 report formats | Completed |
+| **0.2** | Nmap process integration and metadata, styled terminal, Windows graphical installer, license and acceptance wizard, CI installer validation | **Current prototype** |
+| 0.25 | Deeper real-world Windows/Nmap compatibility testing, more installation diagnostics and service fingerprint review | Planned |
 | 0.3 | Versioned report schema, report diffing, additional tests | Planned |
 | 0.4 | Opt-in safe integrations (e.g., Semgrep / Trivy) and dependency inventory | Proposed |
 | 1.0 | Stable API/CLI contracts, documented releases, reproducible signed packages | Long-term goal |
@@ -368,6 +411,10 @@ Roadmap items are **not** implemented features or delivery commitments.
 - [JSON report structure](docs/report-format.md)
 - [Safety boundaries and scope controls](docs/security-model.md)
 - [Development and test workflow](docs/development.md)
+- [Windows installer and download guide](docs/windows-installer.md)
+- [Nmap integration specification and licensing](docs/nmap-integration.md)
+- [SecuBrain 0.2.0 release notes](docs/release-notes/v0.2.0.md)
+- [Full installer terms](legal/INSTALLER-TERMS.txt)
 - [Safe demo fixture](examples/README.md)
 - [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md)
 
@@ -375,7 +422,7 @@ Roadmap items are **not** implemented features or delivery commitments.
 
 Issues and pull requests are welcome for bug reports, documentation, additional safe detection rules, tests, and portability fixes. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a PR. For vulnerabilities in SecuBrain itself, use the process in [`SECURITY.md`](SECURITY.md) rather than filing public exploit details.
 
-**License:** No open-source license has been selected yet. The repository is publicly readable, but that alone does not grant permission to redistribute or reuse its contents. A license decision will be documented explicitly before an open-source release.
+**Source licensing:** No open-source license has been selected yet. The installer contains a separate acceptable-use and no-warranty agreement; this does not grant rights to Nmap or Npcap. The repository is publicly readable, but that alone does not grant permission to redistribute or reuse its contents. A license decision will be documented explicitly before an open-source release.
 
 ---
 

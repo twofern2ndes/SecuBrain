@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const Version = "0.1.0"
+const Version = "0.2.0"
 
 type Config struct {
 	Path       string
@@ -22,6 +22,7 @@ type Config struct {
 	Output     string
 	Authorized bool
 	Nmap       bool
+	NmapBinary string
 	MaxFiles   int
 	Timeout    time.Duration
 }
@@ -48,21 +49,25 @@ type Stats struct {
 }
 
 type Report struct {
-	Tool       string    `json:"tool"`
-	Version    string    `json:"version"`
-	StartedAt  time.Time `json:"started_at"`
-	FinishedAt time.Time `json:"finished_at"`
-	Path       string    `json:"path,omitempty"`
-	URL        string    `json:"url,omitempty"`
-	Stats      Stats     `json:"stats"`
-	Findings   []Finding `json:"findings"`
-	Warnings   []string  `json:"warnings"`
-	Checks     []string  `json:"checks"`
+	Tool       string       `json:"tool"`
+	Version    string       `json:"version"`
+	StartedAt  time.Time    `json:"started_at"`
+	FinishedAt time.Time    `json:"finished_at"`
+	Path       string       `json:"path,omitempty"`
+	URL        string       `json:"url,omitempty"`
+	Stats      Stats        `json:"stats"`
+	Findings   []Finding    `json:"findings"`
+	Warnings   []string     `json:"warnings"`
+	Checks     []string     `json:"checks"`
+	Nmap       *NmapSummary `json:"nmap,omitempty"`
 }
 
 func (c *Config) validate() error {
 	if c.Path == "" && c.URL == "" {
 		return errors.New("provide a project path or a web URL")
+	}
+	if c.NmapBinary != "" && !c.Nmap {
+		return errors.New("--nmap-bin requires --nmap")
 	}
 	if c.Nmap && c.URL == "" {
 		return errors.New("--nmap requires --url")
@@ -181,7 +186,7 @@ func Run(ctx context.Context, cfg Config, progress func(string)) (Report, error)
 	if cfg.Nmap {
 		say("Checking common TCP ports with Nmap...")
 		scanNmap(ctx, cfg, &report)
-		report.Checks = append(report.Checks, "Optional Nmap common TCP port discovery")
+		report.Checks = append(report.Checks, "Optional Nmap TCP connect and light service discovery (100 common ports, low rate, 80s host limit)")
 	}
 	summarize(&report)
 	report.FinishedAt = time.Now().UTC()

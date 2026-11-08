@@ -32,13 +32,17 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.015em;margin:48px 0 15px}h3{f
 <div class="grid"><div class="metric"><strong>{{.Stats.High}}</strong><span>High</span></div><div class="metric"><strong>{{.Stats.Medium}}</strong><span>Medium</span></div><div class="metric"><strong>{{.Stats.Low}}</strong><span>Low</span></div><div class="metric"><strong>{{.Stats.Info}}</strong><span>Informational</span></div></div>
 </header>
 <div class="note">Automated indicators, not a penetration test. A finding may require manual validation; absence of findings does not establish security. No exploitation or brute-force testing was performed.</div>
-<h2>01 / Findings</h2>
+{{if .Nmap}}<h2>01 / Nmap network discovery</h2>
+<p class="muted small">Execution status: <strong>{{.Nmap.Status}}</strong> · Target: <code>{{.Nmap.Target}}</code> · Duration: {{.Nmap.DurationMS}} ms</p>
+<p class="muted small">Mode: {{.Nmap.Mode}} · Open TCP ports observed: {{.Nmap.OpenTCPPorts}} · Version: {{.Nmap.Version}}</p>
+<p class="note">Nmap is a separately installed third-party tool. Service detection is an estimate, not exploit validation.</p>{{end}}
+<h2>02 / Findings</h2>
 {{if .Findings}}{{range .Findings}}<article class="finding"><div class="finding-top"><h3>{{.Title}}</h3><span class="sev sev-{{.Severity}}">{{.Severity}}</span></div>
 <div class="small muted">{{.ID}} / {{.Category}}</div><p>{{.Description}}</p>
 <dl><dt>Location</dt><dd class="label">{{if .Location}}{{.Location}}{{if .Line}}:{{.Line}}{{end}}{{else}}—{{end}}</dd>
 <dt>Evidence</dt><dd>{{.Evidence}}</dd><dt>Recommendation</dt><dd>{{.Recommendation}}</dd></dl></article>{{end}}{{else}}<p class="muted">No indicators detected by the enabled checks.</p>{{end}}
-<h2>02 / Checks performed</h2><ul>{{range .Checks}}<li>{{.}}</li>{{end}}</ul>
-<h2>03 / Execution notes</h2><p class="muted small">Files inspected: {{.Stats.FilesInspected}} · Bytes inspected: {{.Stats.BytesInspected}}</p>
+<h2>03 / Checks performed</h2><ul>{{range .Checks}}<li>{{.}}</li>{{end}}</ul>
+<h2>04 / Execution notes</h2><p class="muted small">Files inspected: {{.Stats.FilesInspected}} · Bytes inspected: {{.Stats.BytesInspected}}</p>
 {{if .Warnings}}<ul>{{range .Warnings}}<li>{{.}}</li>{{end}}</ul>{{else}}<p class="muted">No execution warnings.</p>{{end}}
 <div class="footer">SECUBRAIN v{{.Version}} &nbsp;/&nbsp; Deterministic analysis &nbsp;/&nbsp; For authorized systems only</div>
 </main></body></html>`
@@ -89,7 +93,11 @@ func asMarkdown(r Report) string {
 		fmt.Fprintf(&b, "**URL:** %s  \n", cleanMD(r.URL))
 	}
 	fmt.Fprintf(&b, "\n**Indicators:** %d high · %d medium · %d low · %d informational\n\n", r.Stats.High, r.Stats.Medium, r.Stats.Low, r.Stats.Info)
-	b.WriteString("> Automated indicators only, not a penetration test. No exploitation or brute force was performed.\n\n## Findings\n\n")
+	b.WriteString("> Automated indicators only, not a penetration test. No exploitation or brute force was performed.\n\n")
+	if r.Nmap != nil {
+		fmt.Fprintf(&b, "## Nmap network discovery\n\n- Status: %s\n- Target: %s\n- Version: %s\n- Mode: %s\n- Open TCP ports: %d\n- Duration: %d ms\n\n", cleanMD(r.Nmap.Status), cleanMD(r.Nmap.Target), cleanMD(r.Nmap.Version), cleanMD(r.Nmap.Mode), r.Nmap.OpenTCPPorts, r.Nmap.DurationMS)
+	}
+	b.WriteString("## Findings\n\n")
 	if len(r.Findings) == 0 {
 		b.WriteString("No indicators detected by the enabled checks.\n\n")
 	}

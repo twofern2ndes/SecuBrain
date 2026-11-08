@@ -40,3 +40,13 @@ A `Report` contains version, input scope, UTC timestamps, statistics, findings, 
 Parsing a directory or a remote response does not guarantee correctness. Static signatures can trigger on innocuous examples or miss obfuscated or runtime-derived credentials. The scanner neither validates active tokens nor determines exploitability. `--authorized` is an operator assertion only. Network requests and Nmap operations must be approved within the target owner's scope.
 
 Reports suppress matched credential values but can include file locations and endpoint names. Review the generated reports before sharing them externally.
+
+## 0.2.0 components
+
+- `internal/ui` handles the TTY-aware CLI presentation, plain fallback and Windows console virtual terminal setup.
+- `internal/audit/nmap.go` locates Nmap separately, queries its version, runs a fixed low-rate command through `exec.CommandContext` and parses its XML.
+- `internal/audit/testdata/fakenmap` is a test-double executable. It does not send packets; the fixed argv and interpretation are verified in integration tests.
+- `installer/SecuBrain.iss` builds the guided Windows installer from the Windows CLI binary and project documentation, with an explicit user-acceptance page. Nmap/Npcap are never packed.
+- `.github/workflows/windows-installer.yml` builds the installer on a Windows runner, performs a sandboxed install/uninstall smoke test, and publishes a prerelease only after validation.
+
+The installer and program are independent: running `secubrain.exe` from a source build does not trigger installation, and installing SecuBrain does not perform network scans automatically.

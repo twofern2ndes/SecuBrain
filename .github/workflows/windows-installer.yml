@@ -1,0 +1,111 @@
+name: Windows installer / CI and prerelease
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows-installer:
+    name: Build, install smoke test, publish
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Run Go tests and vet
+        shell: pwsh
+        run: |
+          go test -count=1 ./...
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          go vet ./...
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Build SecuBrain CLI
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          go build -trimpath -ldflags '-s -w' -o dist\secubrain.exe ./cmd/secubrain
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & '.\dist\secubrain.exe' version
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Ensure Inno Setup 6 is installed
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup --no-progress -y
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
+          if (-not (Test-Path $iscc)) { throw 'Inno Setup compiler unavailable' }
+          Write-Host "Using $iscc"
+
+      - name: Compile graphical Windows installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          & $iscc 'installer\SecuBrain.iss'
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          if (-not (Test-Path 'dist\SecuBrain-Setup-v0.2.0-windows-x64.exe')) { throw 'Installer missing' }
+
+      - name: Install and uninstall smoke test (CI only)
+        shell: pwsh
+        run: |
+          $setup = (Resolve-Path 'dist\SecuBrain-Setup-v0.2.0-windows-x64.exe').Path
+          $testDir = Join-Path $env:RUNNER_TEMP 'SecuBrain-TestInstall'
+          $args = @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $testDir + '"'))
+          $proc = Start-Process -FilePath $setup -ArgumentList $args -Wait -PassThru
+          if ($proc.ExitCode -ne 0) { throw "Setup failed with $($proc.ExitCode)" }
+          $exe = Join-Path $testDir 'secubrain.exe'
+          if (-not (Test-Path $exe)) { throw 'SecuBrain not installed' }
+          & $exe version
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          & $exe doctor
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          $uninstall = Join-Path $testDir 'unins000.exe'
+          if (-not (Test-Path $uninstall)) { throw 'Uninstaller missing' }
+          $un = Start-Process -FilePath $uninstall -ArgumentList @('/VERYSILENT','/NORESTART') -Wait -PassThru
+          if ($un.ExitCode -ne 0) { throw "Uninstall failed with $($un.ExitCode)" }
+
+      - name: Create SHA-256 checksum
+        shell: pwsh
+        run: |
+          $setup = Get-Item 'dist\SecuBrain-Setup-v0.2.0-windows-x64.exe'
+          $hash = (Get-FileHash -Algorithm SHA256 -Path $setup.FullName).Hash.ToLowerInvariant()
+          "$hash  $($setup.Name)" | Out-File -FilePath 'dist\SHA256SUMS.txt' -Encoding ascii
+          Get-Content 'dist\SHA256SUMS.txt'
+
+      - name: Upload installer as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SecuBrain-v0.2.0-Windows-Installer
+          path: |
+            dist/SecuBrain-Setup-v0.2.0-windows-x64.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Publish GitHub prerelease after validation
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view 'v0.2.0' --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host 'v0.2.0 release already exists; do not silently replace published assets.'
+            exit 0
+          }
+          gh release create 'v0.2.0' 'dist/SecuBrain-Setup-v0.2.0-windows-x64.exe' 'dist/SHA256SUMS.txt' --repo $env:GITHUB_REPOSITORY --target '${{ github.sha }}' --title 'SecuBrain 0.2.0 — Windows Installer & Nmap Adapter' --notes-file 'docs/release-notes/v0.2.0.md' --prerelease
+          if ($LASTEXITCODE -ne 0) { exit 1 }

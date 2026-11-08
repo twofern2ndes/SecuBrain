@@ -23,3 +23,11 @@ SecuBrain is designed for **bounded, explicitly authorized assessment**. It does
 ## Reporting security vulnerabilities in SecuBrain
 
 Do not publish working exploit details or private tokens in public issues. Read [`../SECURITY.md`](../SECURITY.md). Report a concise impact summary, affected version, controlled reproduction, and remediation ideas through a private channel when available.
+
+## Windows installer security boundary
+
+The SecuBrain installer does not bundle Nmap or Npcap. The installer presents project terms, explicit acceptance and an optional external Nmap download link. The setup uses per-user installation by default; it does not require administrator privileges. Source license selection is separate from the installation terms. The project does not claim its liability limitations can override mandatory applicable law.
+
+## Optional Nmap adapter (v0.2)
+
+The operator must provide an authorized URL and opt in via `--authorized --nmap`; no scanning begins automatically. The argument set is a fixed allowlist: TCP connect, 100 common ports, light version detection, conservative timing, a rate ceiling, and a host timeout. No command shell, arbitrary flags or NSE scripts are invoked. Results are parsed from XML and encoded/escaped into reports. A best-effort service version may be wrong and is not proof of a vulnerability.
