@@ -1,0 +1,20 @@
+# Sensitive audit results and execution artifacts
+secubrain-reports/
+reports/
+*.exe
+/bin/
+/build/
+/dist/
+*.test
+*.out
+coverage.txt
+
+# Local secrets and machine settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+.idea/
+.vscode/

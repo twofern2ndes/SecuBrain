@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="710" viewBox="0 0 1440 710" role="img" aria-label="Local audit">
+<rect width="1440" height="710" rx="22" fill="#090d12"/>
+<rect x="24" y="24" width="1392" height="662" rx="16" fill="#111820" stroke="#334254" stroke-width="2"/>
+<path d="M24 96H1416" stroke="#2d3845" stroke-width="2"/>
+<circle cx="65" cy="60" r="8" fill="#a8595d"/><circle cx="91" cy="60" r="8" fill="#a18959"/><circle cx="117" cy="60" r="8" fill="#5b987d"/>
+<text x="150" y="67" fill="#d2dde9" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="20" font-weight="600">SECUBRAIN / LOCAL AUDIT</text>
+<text x="58" y="143" fill="#7f8fa4" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="20" font-weight="400">VERIFIED LOCAL EXECUTION  /  GO 1.23  /  SYNTHETIC FIXTURE</text>
+<text x="58" y="208" fill="#e3e9f1" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">$ ./secubrain scan --path ./examples/demo-project --out ./secubrain-reports</text>
+<text x="58" y="251" fill="#9cacbd" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">[&gt;] Inspecting project files...</text>
+<text x="58" y="294" fill="#9cacbd" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">[&gt;] Writing HTML, Markdown and JSON reports...</text>
+<text x="58" y="337" fill="#9cacbd" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400"></text>
+<text x="58" y="380" fill="#9ed4b3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">[OK] Inspected 2 files. Findings: 0 high / 2 medium / 0 low / 0 info</text>
+<text x="58" y="423" fill="#9ed4b3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">[OK] Report: .../secubrain-reports/report.html</text>
+<text x="58" y="466" fill="#9ed4b3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">[OK] JSON:   .../secubrain-reports/report.json</text>
+<text x="58" y="509" fill="#9ed4b3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">[OK] Markdown: .../secubrain-reports/report.md</text>
+<path d="M58 634H1382" stroke="#303f50"/>
+<text x="58" y="667" fill="#8292a5" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="17" font-weight="400">Source: actual SecuBrain CLI output; absolute paths shortened for documentation.</text>
+</svg>

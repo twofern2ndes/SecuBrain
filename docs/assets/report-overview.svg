@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="780" viewBox="0 0 1440 780" role="img" aria-label="SecuBrain generated report overview">
+<rect width="1440" height="780" rx="22" fill="#090d12"/>
+<rect x="32" y="28" width="1376" height="724" rx="14" fill="#111820" stroke="#334254" stroke-width="2"/>
+<text x="72" y="87" fill="#8494a9" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="19" font-weight="600">SECUBRAIN / AUTOMATED AUDIT REPORT</text>
+<text x="72" y="165" fill="#f1f4f8" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="61" font-weight="650">Security. Report</text>
+<text x="73" y="208" fill="#8b99ad" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" font-weight="400">v0.1.0  ·  synthetic demo-project  ·  no exploitation performed</text>
+<rect x="72" y="252" width="307" height="138" rx="10" fill="#17212b" stroke="#2f4052"/>
+<text x="96" y="310" fill="#b8c4d2" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="48" font-weight="650">0</text>
+<text x="97" y="353" fill="#96a6ba" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="18" font-weight="600">HIGH</text>
+<rect x="402" y="252" width="307" height="138" rx="10" fill="#17212b" stroke="#2f4052"/>
+<text x="426" y="310" fill="#f0cb88" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="48" font-weight="650">2</text>
+<text x="427" y="353" fill="#96a6ba" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="18" font-weight="600">MEDIUM</text>
+<rect x="732" y="252" width="307" height="138" rx="10" fill="#17212b" stroke="#2f4052"/>
+<text x="756" y="310" fill="#b8c4d2" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="48" font-weight="650">0</text>
+<text x="757" y="353" fill="#96a6ba" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="18" font-weight="600">LOW</text>
+<rect x="1062" y="252" width="307" height="138" rx="10" fill="#17212b" stroke="#2f4052"/>
+<text x="1086" y="310" fill="#b8c4d2" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="48" font-weight="650">0</text>
+<text x="1087" y="353" fill="#96a6ba" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="18" font-weight="600">INFO</text>
+<text x="72" y="458" fill="#dce6f2" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="22" font-weight="600">01  /  FINDINGS</text>
+<rect x="72" y="482" width="1295" height="109" rx="10" fill="#18222d" stroke="#344556"/>
+<text x="95" y="525" fill="#ecf2f8" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="600">Potential hardcoded credential</text>
+<text x="95" y="560" fill="#a6b6c8" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="19" font-weight="400">app.py:4  •  Credential-style assignment detected; value redacted</text>
+<rect x="72" y="605" width="1295" height="94" rx="10" fill="#18222d" stroke="#344556"/>
+<text x="95" y="644" fill="#ecf2f8" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="600">Potential hardcoded credential</text>
+<text x="95" y="677" fill="#a6b6c8" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="19" font-weight="400">app.py:5  •  Credential-style assignment detected; value redacted</text>
+<text x="73" y="737" fill="#8090a2" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="16" font-weight="400">Visualization of real synthetic-fixture JSON output; not a production scan.</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="710" viewBox="0 0 1440 710" role="img" aria-label="Test suite">
+<rect width="1440" height="710" rx="22" fill="#090d12"/>
+<rect x="24" y="24" width="1392" height="662" rx="16" fill="#111820" stroke="#334254" stroke-width="2"/>
+<path d="M24 96H1416" stroke="#2d3845" stroke-width="2"/>
+<circle cx="65" cy="60" r="8" fill="#a8595d"/><circle cx="91" cy="60" r="8" fill="#a18959"/><circle cx="117" cy="60" r="8" fill="#5b987d"/>
+<text x="150" y="67" fill="#d2dde9" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="20" font-weight="600">SECUBRAIN / TEST SUITE</text>
+<text x="58" y="143" fill="#7f8fa4" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="20" font-weight="400">GO TEST -COUNT=1 -V ./...   /   8 PASSING TESTS</text>
+<text x="58" y="208" fill="#b9c5d3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">=== RUN   TestLocalAuditRedactsCredentialsInAllReports</text>
+<text x="58" y="251" fill="#9ed4b3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">--- PASS: TestLocalAuditRedactsCredentialsInAllReports</text>
+<text x="58" y="294" fill="#b9c5d3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">=== RUN   TestAuthorizedWebHeaderAudit</text>
+<text x="58" y="337" fill="#9ed4b3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">--- PASS: TestAuthorizedWebHeaderAudit</text>
+<text x="58" y="380" fill="#b9c5d3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">=== RUN   TestWebRedirectNotFollowed / TestURLValidation</text>
+<text x="58" y="423" fill="#9ed4b3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">--- PASS: both tests</text>
+<text x="58" y="466" fill="#b9c5d3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">=== RUN   Nmap XML / HTML escaping / CLI parsing tests</text>
+<text x="58" y="509" fill="#9ed4b3" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="25" font-weight="400">--- PASS: all remaining tests     TOTAL: 8 PASS</text>
+<path d="M58 634H1382" stroke="#303f50"/>
+<text x="58" y="667" fill="#8292a5" font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace" font-size="17" font-weight="400">Summary formatted from real Go test output; names combined for readability.</text>
+</svg>

@@ -1,0 +1,43 @@
+{
+  "tool": "SecuBrain",
+  "version": "0.1.0",
+  "started_at": "2026-11-08T00:00:00Z",
+  "finished_at": "2026-11-08T00:00:00Z",
+  "path": "examples/demo-project",
+  "stats": {
+    "files_inspected": 2,
+    "bytes_inspected": 382,
+    "high": 0,
+    "medium": 2,
+    "low": 0,
+    "info": 0
+  },
+  "findings": [
+    {
+      "id": "SB-9645B30E",
+      "severity": "medium",
+      "category": "credentials",
+      "title": "Potential hardcoded credential",
+      "description": "An assignment to a credential-like key appears to contain a literal value.",
+      "evidence": "Credential-style assignment detected; value redacted",
+      "location": "app.py",
+      "line": 4,
+      "recommendation": "Verify whether it is a secret; move genuine secrets out of source and rotate if necessary."
+    },
+    {
+      "id": "SB-F86970CC",
+      "severity": "medium",
+      "category": "credentials",
+      "title": "Potential hardcoded credential",
+      "description": "An assignment to a credential-like key appears to contain a literal value.",
+      "evidence": "Credential-style assignment detected; value redacted",
+      "location": "app.py",
+      "line": 5,
+      "recommendation": "Verify whether it is a secret; move genuine secrets out of source and rotate if necessary."
+    }
+  ],
+  "warnings": [],
+  "checks": [
+    "Local file patterns, credential exposure indicators, .gitignore checks"
+  ]
+}
