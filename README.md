@@ -1,18 +1,14 @@
-<div align="center">
+<p align="center"><sub>SECURITY ENGINEERING &nbsp;/&nbsp; LOCAL-FIRST AUDITING &nbsp;/&nbsp; DETERMINISTIC EXECUTION</sub></p>
 
-<sub>SECURITY ENGINEERING &nbsp;/&nbsp; LOCAL-FIRST AUDITING &nbsp;/&nbsp; DETERMINISTIC EXECUTION</sub>
+<h1 align="center">SecuBrain.</h1>
 
-# SecuBrain<span>.</span>
+<p align="center"><strong>A minimal, evidence-oriented security auditing CLI — built in Go, without AI.</strong></p>
 
-**A minimal, evidence-oriented security auditing CLI — built in Go, without AI.**
+<p align="center">Analyze a local codebase, inspect approved HTTP endpoints, optionally discover TCP services,<br>and export structured findings to <strong>HTML, Markdown, and JSON</strong>.</p>
 
-Analyze a local codebase, inspect approved HTTP endpoints, optionally discover TCP services, and export structured findings to **HTML, Markdown, and JSON**.
+<p align="center"><a href="#quick-start">Getting started</a> · <a href="#documentation">Documentation</a> · <a href="docs/architecture.md">Architecture</a> · <a href="#authorization--safety">Security model</a> · <a href="#roadmap">Roadmap</a></p>
 
-[Getting started](#quick-start) · [Documentation](#documentation) · [Architecture](docs/architecture.md) · [Security model](#authorization--safety) · [Roadmap](#roadmap)
-
-<sub>v0.1.0 PROTOTYPE &nbsp;·&nbsp; GO 1.23+ &nbsp;·&nbsp; CROSS-PLATFORM SOURCE &nbsp;·&nbsp; NO CLOUD ACCOUNT &nbsp;·&nbsp; NO LLM</sub>
-
-</div>
+<p align="center"><sub>v0.1.0 PROTOTYPE &nbsp;·&nbsp; GO 1.23+ &nbsp;·&nbsp; CROSS-PLATFORM SOURCE &nbsp;·&nbsp; NO CLOUD ACCOUNT &nbsp;·&nbsp; NO LLM</sub></p>
 
 ---
 
@@ -383,12 +379,8 @@ Issues and pull requests are welcome for bug reports, documentation, additional 
 
 ---
 
-<div align="center">
+<p align="center"><sub>SECUBRAIN &nbsp;·&nbsp; BUILT WITH GO &nbsp;·&nbsp; DETERMINISTIC BY DESIGN</sub></p>
 
-<sub>SECUBRAIN &nbsp;·&nbsp; BUILT WITH GO &nbsp;·&nbsp; DETERMINISTIC BY DESIGN</sub>
+<p align="center"><strong>Maintained by <a href="https://github.com/twofern2ndes">twofern2ndes</a></strong></p>
 
-**Maintained by [twofern2ndes](https://github.com/twofern2ndes)**
-
-<sub>Understand the system. Collect evidence. Report responsibly.</sub>
-
-</div>
+<p align="center"><sub>Understand the system. Collect evidence. Report responsibly.</sub></p>
