@@ -1,9 +1,9 @@
 ; SecuBrain Windows installer (Inno Setup 6.x).
 ; This package contains ONLY SecuBrain's original program and documentation.
-; Nmap and Npcap are NEVER embedded or downloaded by this setup.
+; Nmap and Npcap are NOT distributed by this setup. Users install them independently.
 
 #define AppName "SecuBrain"
-#define AppVersion "0.2.0"
+#define AppVersion "0.3.0"
 #define AppPublisher "twofern2ndes"
 
 [Setup]
@@ -38,7 +38,7 @@ DisableWelcomePage=no
 DisableDirPage=no
 DisableReadyPage=no
 DisableFinishedPage=no
-VersionInfoVersion=0.2.0.0
+VersionInfoVersion=0.3.0.0
 VersionInfoDescription=SecuBrain local-first security auditing CLI
 VersionInfoCompany={#AppPublisher}
 VersionInfoProductName={#AppName}
@@ -89,6 +89,7 @@ end;
 procedure UpdateUserPath(const AddEntry: Boolean);
 var
   PathText, Target, NewText: String;
+  Managed: Cardinal;
 begin
   Target := UserExecutableDir();
   if not RegQueryStringValue(HKCU, 'Environment', 'Path', PathText) then
@@ -103,18 +104,24 @@ begin
         NewText := PathText + Target
       else
         NewText := PathText + ';' + Target;
-      RegWriteExpandStringValue(HKCU, 'Environment', 'Path', NewText);
+      if RegWriteExpandStringValue(HKCU, 'Environment', 'Path', NewText) then
+        RegWriteDWordValue(HKCU, 'Software\SecuBrain', 'PathManaged', 1);
     end;
   end
   else
   begin
-    { Remove only the exact SecuBrain directory; leave other PATH entries. }
+    { Never delete a PATH entry which this installer did not create. }
+    if not RegQueryDWordValue(HKCU, 'Software\SecuBrain', 'PathManaged', Managed) then Exit;
+    if Managed <> 1 then Exit;
     NewText := ';' + PathText + ';';
     StringChangeEx(NewText, ';' + Target + ';', ';', True);
-    if Length(NewText) >= 2 then
+    if NewText = ';' then
+      NewText := ''
+    else if Length(NewText) >= 2 then
       NewText := Copy(NewText, 2, Length(NewText) - 2);
     if NewText <> PathText then
       RegWriteExpandStringValue(HKCU, 'Environment', 'Path', NewText);
+    RegDeleteValue(HKCU, 'Software\SecuBrain', 'PathManaged');
   end;
 end;
 
@@ -126,6 +133,16 @@ begin
     MsgBox('Please open https://nmap.org/download.html in your browser.', mbInformation, MB_OK);
 end;
 
+function NmapInstallStatus(): String;
+begin
+  if FileExists(ExpandConstant('{pf64}\Nmap\nmap.exe')) or
+     FileExists(ExpandConstant('{pf32}\Nmap\nmap.exe')) or
+     FileExists(ExpandConstant('{localappdata}\Nmap\nmap.exe')) then
+    Result := 'Detected in a common install location; confirm with secubrain doctor.'
+  else
+    Result := 'Not found in the common locations; you can install it separately.';
+end;
+
 procedure InitializeWizard;
 begin
   NmapPage := CreateCustomPage(wpSelectTasks, 'Nmap integration (optional)',
@@ -134,15 +151,16 @@ begin
   NmapText.Parent := NmapPage.Surface;
   NmapText.AutoSize := False;
   NmapText.WordWrap := True;
-  NmapText.SetBounds(0, ScaleY(12), NmapPage.SurfaceWidth, ScaleY(156));
+  NmapText.SetBounds(0, ScaleY(12), NmapPage.SurfaceWidth, ScaleY(176));
   NmapText.Caption :=
-    'SecuBrain supports the Nmap network scanner but DOES NOT include Nmap or Npcap.' + #13#10#13#10 +
+    'SecuBrain v0.3 offers quick, standard, full TCP, and optional UDP/OS/NSE scanning through Nmap.' + #13#10#13#10 +
+    'Nmap installation: ' + NmapInstallStatus() + #13#10#13#10 +
     'Nmap and Npcap are separate projects with independent licenses. Redistributing their free Windows installers within SecuBrain is not permitted without appropriate rights.' + #13#10#13#10 +
     'To enable Nmap checks: install SecuBrain, download Nmap independently from the official website, complete the Nmap/Npcap installer and license prompts, then run: secubrain doctor.' + #13#10#13#10 +
     'Normal local source audits work even if you do not install Nmap.';
   NmapButton := TNewButton.Create(NmapPage);
   NmapButton.Parent := NmapPage.Surface;
-  NmapButton.SetBounds(0, ScaleY(190), ScaleX(248), ScaleY(30));
+  NmapButton.SetBounds(0, ScaleY(196), ScaleX(248), ScaleY(30));
   NmapButton.Caption := 'Open official Nmap download page';
   NmapButton.OnClick := @OpenNmapOfficialSite;
 end;

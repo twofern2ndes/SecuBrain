@@ -1,56 +1,51 @@
-# Report data format (prototype)
+# SecuBrain report format — v0.3.0
 
-Each successful run creates `report.html`, `report.md`, and `report.json` in the configured report directory. The files represent the same audit; Markdown and HTML are intended for review, JSON for downstream tools.
+Every completed audit writes three related representations to the requested local output directory:
 
-## JSON top-level fields
+- `report.json` — **canonical machine-readable record**, including all parsed Nmap hosts/ports within resource limits.
+- `report.html` — self-contained, HTML-escaped human-readable summary of findings and Nmap service inventory.
+- `report.md` — concise text report with port table and discoveries for review or versioned internal records.
 
-| Property | Type | Description |
-|---|---|---|
-| `tool` | string | `SecuBrain` |
-| `version` | string | Tool version (`0.1.0`) |
-| `started_at`, `finished_at` | RFC3339 timestamps | UTC execution window |
-| `path` | string, optional | Local absolute project directory |
-| `url` | string, optional | User-supplied endpoint |
-| `stats` | object | Counts and inspected file/byte totals |
-| `findings` | array | Sorted detected indicators |
-| `warnings` | array of strings | Partial/incomplete check information |
-| `checks` | array of strings | Enabled checks performed or attempted |
+The JSON document has top-level `tool`, `version`, `started_at`, `finished_at`, optional `path`, `url`, and `target`, `stats`, `findings`, `warnings`, `checks`, and optional `nmap`.
 
-## Finding properties
+`findings[]` entries contain a stable reference `id`, `severity` (`high`, `medium`, `low`, `info`), `category`, `title`, `description`, `evidence`, optional `location`/`line`, and `recommendation`. Potential secrets are represented as redacted indicators, not matched credential strings.
 
-- `id`: short deterministic identifier, for example `SB-9645B30E`.
-- `severity`: `high`, `medium`, `low`, or `info`.
-- `category`: rule family, e.g. `credentials`, `repository`, `web-hardening`, or `network-discovery`.
-- `title` and `description`: explanation of the indicator.
-- `evidence`: a generic statement, **not** a secret string or raw source line.
-- `location`: file-relative path or endpoint/host indicator.
-- `line`: optional line number for local source findings.
-- `recommendation`: review or mitigation suggestion.
+## Nmap inventory
 
-See [`samples/demo-report.json`](samples/demo-report.json) for a sanitized fixture result generated from the local demo. The sample is not evidence of a breach or a production vulnerability.
-
-## Reading result severity correctly
-
-`high` means the scanner treats the matched pattern as potentially significant, not that exploitation is confirmed. Header omissions are often deployment-specific. An observed TCP port is informational. Missing findings means no triggered rule within scan limits, **not** security validation.
-
-## Privacy and stable use
-
-Do not publish reports about confidential project paths, hosts, or internal topology. The output folder is ignored by the repository's `.gitignore`; keep the same hygiene in downstream CI logs. The JSON structure is a prototype interface and may change before a stable release. Downstream consumers should tolerate unknown fields and missing optional properties.
-
-## Nmap integration fields (v0.2.0)
-
-When `--nmap` is requested, reports include a `nmap` object:
+`nmap` contains:
 
 ```json
 {
   "status": "completed",
   "target": "127.0.0.1",
-  "mode": "TCP connect; 100 common ports; light service detection; low rate",
-  "version": "Nmap fixture 0.0.0 (test double)",
-  "duration_ms": 18,
+  "profile": "standard",
+  "mode": "TCP connect + service/version detection",
+  "version": "Nmap fixture 0.3.0 (test executable)",
+  "duration_ms": 15,
   "open_tcp_ports": 1,
-  "binary_source": "explicit override"
+  "open_udp_ports": 0,
+  "hosts_up": 1,
+  "binary_source": "explicit override",
+  "hosts": [
+    {
+      "status": "up", "addresses": ["127.0.0.1"],
+      "ports": [
+        {"protocol":"tcp", "number":443, "state":"open", "service":"https", "product":"Fixture Web", "version":"1.2.3"}
+      ],
+      "extra_port_states":{"filtered":98}
+    }
+  ]
 }
 ```
 
-This is a **synthetic sample**, not a live network scan. Values are illustrative. `status` may also be `skipped` or `failed`, and a completed scan with no open ports does not establish absence of vulnerabilities.
+This is an **illustrative synthetic fixture**, not a real network result. The complete schema may also contain host reason, hostnames, `os_matches` (name/accuracy), `uptime_seconds`, port reason, `extra_info`, `tunnel`, `method`, `confidence`, `cpe` and `scripts` (NSE ID and sanitized output). Port list includes all Nmap-explicitly-reported states; `extra_port_states` reflects aggregated Nmap XML counts, not enumerated port detail.
+
+A completed scan can return zero open ports. `partial` means Nmap exited unsuccessfully but returned parseable XML. `skipped` means the requested tool could not be located; `failed` means no trustworthy complete result was obtained. **Any status other than completed yields a nonzero CLI exit code**, although partial reports are saved.
+
+Informational findings are emitted only for explicitly reported `open` ports, not for closed, filtered or ambiguous `open|filtered` states. The finding count is capped at 1,000 even when structured inventory contains more. HTML/Markdown may cap port previews at 500; use JSON for complete normalized parsed data.
+
+## Data security and compatibility
+
+Potentially confidential paths, hostnames, service versions, OS guesses and script output are stored locally. Review and sanitize before sharing. HTML uses Go `html/template`; Markdown normalizes control characters, line breaks and table separators. Output values are evidence/observations, **not** CVE validation, regulatory compliance assurance or proof of exploitability.
+
+The schema may evolve until a stable release. JSON consumers should tolerate additional fields and partial/empty nested data.

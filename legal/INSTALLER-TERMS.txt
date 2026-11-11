@@ -1,5 +1,5 @@
 SECUBRAIN SOFTWARE INSTALLATION AND ACCEPTABLE-USE AGREEMENT
-Version 0.2.0 (prototype) -- November 2026
+Version 0.3.0 (prototype) -- November 2026
 
 PLEASE READ THIS AGREEMENT CAREFULLY. SELECT "I ACCEPT THE AGREEMENT" ONLY
 IF YOU UNDERSTAND THE CONDITIONS BELOW. IF YOU DO NOT ACCEPT THEM, SELECT
@@ -11,7 +11,11 @@ SecuBrain is a security auditing prototype and developer-oriented CLI.
 The project is designed to support learning, internal code review,
 defensive engineering, authorized security assessments, and professional
 review of systems by their owners or authorized administrators. It performs
-bounded, deterministic checks and produces locally stored reports.
+operator-selected, deterministic checks and produces locally stored reports.
+Nmap quick/standard/full profiles can probe up to 65,535 TCP ports. Optional
+UDP, OS fingerprinting and default NSE scripts cause additional traffic and
+may require local administrator privileges or Npcap. They are disabled unless
+the operator explicitly selects them.
 SecuBrain is not an autonomous exploitation framework, does not contain
 an artificial intelligence engine, and does not attempt to replace a
 qualified human security assessment.

@@ -1,4 +1,4 @@
-SECUBRAIN 0.2.0 / BEFORE INSTALLATION
+SECUBRAIN 0.3.0 / BEFORE INSTALLATION
 =======================================
 
 Thank you for choosing SecuBrain.

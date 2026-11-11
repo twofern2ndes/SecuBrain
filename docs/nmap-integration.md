@@ -1,59 +1,64 @@
-# Nmap adapter / technical design
+# Nmap integration — SecuBrain v0.3.0
 
-SecuBrain v0.2.0 can invoke a **separately installed** Nmap executable. The integration performs a bounded TCP connect scan and low-intensity service identification on **one hostname** extracted from an explicitly authorized HTTP(S) URL.
+SecuBrain invokes the **real, separately installed Nmap executable** to inventory an explicitly authorized host. The adapter uses Go `os/exec` (no shell), reads bounded XML (`-oX -`), normalizes service metadata, and writes results into the same local JSON, HTML, and Markdown reports as the file/HTTP checks. Nmap is authored and licensed by the Nmap Project, **not** by SecuBrain.
 
-## Preconditions
+## Requirements
 
-1. The operator has permission to assess the exact target.
-2. The `--url` input is a clean HTTP(S) URL without credentials, query parameters, or fragments.
-3. `--authorized` is provided explicitly.
-4. `--nmap` opts in to network discovery.
-5. An Nmap executable is available on PATH, in a standard Windows folder, or via `--nmap-bin` / `SECUBRAIN_NMAP_PATH`.
+1. Install Nmap independently from [nmap.org/download.html](https://nmap.org/download.html). On Windows, Npcap may be required for privileged features; install it using the official installer as appropriate.
+2. Run `secubrain doctor` to check the executable and version. If installed outside standard locations, pass `--nmap-bin "C:\\Nmap\\nmap.exe"` or set `SECUBRAIN_NMAP_PATH`.
+3. Obtain explicit written authorization from the host owner and select **one** approved IP address or DNS name. `--authorized` records the operator's assertion but cannot independently verify it.
 
-## Fixed argument allowlist
+```powershell
+# Non-privileged TCP scan of ~100 common ports
+secubrain nmap --target 192.0.2.10 --authorized --nmap-profile quick
 
-SecuBrain invokes Nmap through Go's `exec.CommandContext` with **separate arguments**, never through a shell:
+# Default profile, ~1000 common TCP ports and richer service probes
+secubrain nmap --target 192.0.2.10 --authorized --nmap-profile standard --out C:\\Audits\\host
 
-```text
--sT -sV --version-light -Pn -F -T2 --max-rate 25 --max-retries 1 --host-timeout 80s --open -oX - <exact-hostname>
+# All TCP ports 1..65535, with version discovery
+secubrain nmap --target 192.0.2.10 --authorized --nmap-profile full --out C:\\Audits\\host-full
+
+# Optional additional probes (may require administrator/root + Npcap)
+secubrain nmap --target 192.0.2.10 --authorized --nmap-profile standard --nmap-udp --nmap-os --nmap-scripts
+
+# Combined local source + URL header + Nmap inventory (URL host must match target if specified)
+secubrain scan --path ./project --url https://approved.example --nmap --authorized
 ```
 
-| Argument | Meaning |
-| :--- | :--- |
-| `-sT` | TCP connect scan (does not require raw SYN packet privileges) |
-| `-sV --version-light` | Limited version probing on discovered ports |
-| `-Pn` | Do not use separate host discovery before port checks |
-| `-F` | Fast set of Nmap's common ports (not all 65,535 ports) |
-| `-T2 --max-rate 25` | Conservative timing and rate cap |
-| `--max-retries 1` | Lower probe retry count |
-| `--host-timeout 80s` | Upper Nmap per-host time bound |
-| `--open` | Show only open port results |
-| `-oX -` | XML output through stdout (not untrusted text parsing) |
+## Profiles and optional features
 
-The outer Go process also has a 95-second deadline. Neither these options nor the operator's authorization guarantee zero operational impact. Nmap probing may still affect sensitive systems; obtain approval and schedule a suitable maintenance window.
+| Profile | TCP ports | Version intensity | Default execution timeout | Additional options |
+|---|---|---|---|---|
+| `quick` | Nmap `-F`: ~100 common TCP ports | 2 | 100 seconds | UDP, OS, scripts if enabled |
+| `standard` (default) | Nmap default: ~1000 common TCP ports | 5 | 5 minutes | UDP, OS, scripts if enabled |
+| `full` | **all 65,535 TCP ports** (`-p-`) | 7 | 20 minutes | UDP, OS, scripts if enabled |
 
-## Parsing and results
+All modes use TCP connect (`-sT`), service/version probing (`-sV`), IPv6 mode (`-6`) when necessary, and a single specified target. They avoid initiating multi-target, CIDR, or file-list scans. Nmap scan rate and retry limits are selected by the adapter, not accepted as raw command flags.
 
-SecuBrain parses the Nmap XML response using `encoding/xml`, recognizes open **TCP** ports, and adds informational findings containing service names and best-effort product/version labels. Output is sanitized and limited in length, and HTML reports escape target-supplied strings.
+- `--nmap-udp`: requests UDP scanning (`-sU`). For the `full` profile, UDP is limited to **ports 1..1024** while the TCP scan covers ports 1..65535. UDP service identification can be slow or ambiguous (`open|filtered`). Nmap may require elevated privileges.
+- `--nmap-os`: requests OS fingerprinting (`-O --osscan-limit --max-os-tries 1`); results are **estimates**, and raw-packet privileges are often necessary.
+- `--nmap-scripts`: requests Nmap's **default NSE** script category only (`--script default`). These scripts can generate extra requests and reveal sensitive banners or metadata. This is **off by default**; verify permission and change windows. No arbitrary script or executable content is accepted via the SecuBrain CLI.
+- `--nmap-timeout 120s`: overrides the per-host execution timeout, from `15s` up to `30m`. Timeouts do **not** guarantee all ports completed scanning; check warnings/status.
 
-The JSON report also contains a `nmap` object with the status (`completed`, `skipped`, or `failed`), target, scan mode, version, duration, observed open TCP count, and binary discovery method. It does not include raw XML or claim open ports are exploitable vulnerabilities.
+A full TCP scan is **not** equivalent to all features of Nmap or a penetration test. Scripts, UDP, OS detection, network appliances and target behavior can affect what is discovered.
 
-## Error behavior
+## Output schema and data handling
 
-- Missing Nmap or bad `--nmap-bin`: warning plus `nmap.status=skipped`; local and HTTP checks continue.
-- Missing authorization or invalid URL: input validation error **before** executing checks.
-- Nmap failure or timeout: warning plus `nmap.status=failed`; no fabricated findings.
-- Malformed XML: warning plus `nmap.status=failed`.
-- Valid XML with no open TCP ports: completed scan with zero findings; **not a safety certification**.
+The `nmap` object in `report.json` contains: status (`completed`, `partial`, `skipped`, `failed`), exact target, profile, mode, Nmap version/source, duration, host count, open TCP/UDP counts, and a `hosts` array. Each host includes status, addresses, DNS names, OS matches, uptime, aggregated closed/filtered counts, and sorted port entries. Individual ports record TCP/UDP, port number, state/reason, service name/product/version/extra information, confidence and method, CPE identifiers, and optionally NSE script IDs and bounded outputs.
 
-## What's intentionally out of scope
+Only confirmed `open` ports create **informational** findings. `open|filtered` is retained in the inventory but is **not** counted as open. A port banner or CPE is not a vulnerability assertion; no CVE confirmation or exploitation is performed. At most 1,000 informational port findings are generated; full parsed inventory remains in JSON (within the XML size bound). HTML and Markdown show a smaller operational preview of open/open|filtered ports and refer to JSON for all parsed data.
 
-No NSE scripts, OS fingerprinting, UDP sweeps, large target lists, wildcard CIDRs, stealth scanning, exploit execution, brute force, credential tests or escalation. The adapter does not offer arbitrary Nmap flags.
+- Output XML is capped at **24 MiB** to prevent unbounded memory use.
+- Data derived from remote services is sanitized and HTML-escaped; arbitrary raw XML is not kept in the reports.
+- Privileged scans may fail without adequate permissions or Npcap. Unavailable/failed scans return **nonzero exit status** while preserving a partial report for investigation.
+- The application does not stream the target system's collected data to a cloud AI service. Protect local reports as potentially confidential.
 
-## Third-party rights
+## Licensing and installation boundary
 
-SecuBrain ships **no Nmap/Npcap binary** and is not endorsed by their maintainers. For redistribution requirements, read [Nmap licensing](https://nmap.org/npsl/) and [Npcap redistribution limitations](https://nmap.org/book/man-legal.html).
+The SecuBrain installer includes **SecuBrain only**. Neither Nmap nor Npcap is included or auto-installed. Nmap's [public source license](https://nmap.org/npsl/) and the [Windows/Npcap redistribution restrictions](https://nmap.org/book/man-legal.html) make bundling or repackaging without appropriate rights unsuitable. Official [OEM terms](https://nmap.org/oem/) describe commercial redistribution rights. Users may obtain Nmap separately and use it in accordance with its terms.
 
 ## Tests
 
-`internal/audit/nmap_integration_test.go` builds a small test-only Go executable that mimics Nmap's `--version` and XML response. It validates the exact argv allowlist, parsing, discovery metadata, report output escaping, missing-binary behavior and safe error reporting. This deterministic fixture sends **no network packets**; it is not a replacement for an authorized real-world compatibility test.
+The Go test suite builds a deterministic **test-only Nmap process double** to validate subprocess execution, argv construction, XML parsing, large-output handling, metadata escaping, report writing, and error states without sending packets.
+
+The `Windows installer / CI and prerelease` GitHub Actions workflow additionally installs a real distribution Nmap **inside its Ubuntu CI runner**, starts a temporary HTTP server bound to **127.0.0.1:80**, runs `secubrain nmap --target 127.0.0.1 --authorized`, and asserts the resulting JSON contains the open port. A separate Windows runner compiles the CLI and Inno Setup installer and smoke-tests installation, `doctor`, and uninstall. These checks are meaningful but not certification across every supported Windows/Nmap/Npcap combination.

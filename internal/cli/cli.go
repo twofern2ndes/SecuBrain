@@ -23,6 +23,8 @@ func Run(args []string) int {
 	switch args[0] {
 	case "scan":
 		return scan(args[1:])
+	case "nmap":
+		return scan(append([]string{"--nmap"}, args[1:]...))
 	case "doctor", "tools":
 		return doctor(args[1:])
 	case "help", "--help", "-h":
@@ -39,30 +41,39 @@ func Run(args []string) int {
 }
 
 func usage() {
-	fmt.Printf(`SECUBRAIN v%s — local-first security auditor (no AI)
+	fmt.Printf(`SECUBRAIN v%s — deterministic security auditing (no AI)
 
 Usage:
-  secubrain                                     Launch interactive CLI
-  secubrain doctor                              Check external tools and prerequisites
-  secubrain scan --path ./project               Audit local project
+  secubrain                                      Interactive CLI
+  secubrain doctor                               Locate installed Nmap
+  secubrain scan --path ./project                Local code audit
   secubrain scan --url https://example.org --authorized
+  secubrain nmap --target 192.0.2.10 --authorized
+  secubrain nmap --target 192.0.2.10 --authorized --nmap-profile full
   secubrain scan --url https://example.org --authorized --nmap
-  secubrain scan --url https://example.org --authorized --nmap --nmap-bin /usr/bin/nmap
   secubrain version
 
-Scan flags:
-  --path        Local project directory (may be supplied positionally)
-  --url         Explicitly authorized HTTP(S) endpoint
-  --authorized  Mandatory assertion of permission for remote checks
-  --nmap        Enable bounded, low-rate Nmap TCP service discovery
-  --nmap-bin    Explicit path to user-installed Nmap (optional)
-  --out         Output folder (default: ./secubrain-reports)
-  --max-files   File limit (default 5000)
-  --timeout     HTTP request timeout (default: 8s)
+Network scan options (use with --nmap or with the 'nmap' command):
+  --target           One explicitly authorized IP or DNS hostname
+  --authorized       Mandatory confirmation of authorized network scope
+  --nmap-profile     quick (100 TCP) | standard (1000 TCP) | full (65535 TCP)
+  --nmap-udp         Also scan UDP (may require admin/root/Npcap)
+  --nmap-os          Enable OS fingerprinting (requires raw packet privileges)
+  --nmap-scripts     Enable Nmap's default NSE scripts (extra traffic)
+  --nmap-timeout     Duration per scan (15s..30m, profile-dependent default)
+  --nmap-bin         Path to a separately installed Nmap binary
 
-Nmap is a separately installed third-party tool and is NOT bundled.
-Reports: report.html, report.md, report.json
-Never scan systems without authorization. No exploitation or brute-force.
+General options:
+  --path             Local directory (or single positional directory)
+  --url              Authorized HTTP(S) endpoint, HEAD check only
+  --out              Reports directory (default ./secubrain-reports)
+  --max-files        Max local files (default 5000)
+  --timeout          HTTP request timeout (default 8s)
+
+Reports: report.json (full inventory), report.html, report.md.
+The full Nmap profile scans all TCP ports, not all possible Nmap features.
+Nmap/Npcap are third-party programs installed separately by the operator.
+Use only systems you own or are explicitly authorized to assess.
 `, audit.Version)
 }
 
@@ -99,9 +110,15 @@ func scan(args []string) int {
 	var cfg audit.Config
 	fs.StringVar(&cfg.Path, "path", "", "local project folder")
 	fs.StringVar(&cfg.URL, "url", "", "authorized web URL")
+	fs.StringVar(&cfg.Target, "target", "", "authorized single IP address or DNS hostname")
 	fs.StringVar(&cfg.Output, "out", "secubrain-reports", "output directory")
 	fs.BoolVar(&cfg.Authorized, "authorized", false, "assert authorization for network checks")
-	fs.BoolVar(&cfg.Nmap, "nmap", false, "enable optional bounded Nmap service discovery")
+	fs.BoolVar(&cfg.Nmap, "nmap", false, "enable Nmap service discovery")
+	fs.StringVar(&cfg.NmapProfile, "nmap-profile", "", "quick, standard, or full TCP profile")
+	fs.BoolVar(&cfg.NmapUDP, "nmap-udp", false, "include UDP scanning")
+	fs.BoolVar(&cfg.NmapOS, "nmap-os", false, "OS fingerprinting (admin/root required)")
+	fs.BoolVar(&cfg.NmapScripts, "nmap-scripts", false, "run Nmap default NSE scripts")
+	fs.DurationVar(&cfg.NmapTimeout, "nmap-timeout", 0, "Nmap execution timeout")
 	fs.StringVar(&cfg.NmapBinary, "nmap-bin", "", "path to Nmap executable")
 	fs.IntVar(&cfg.MaxFiles, "max-files", 5000, "maximum files to inspect")
 	fs.DurationVar(&cfg.Timeout, "timeout", 8*time.Second, "network timeout")
@@ -121,7 +138,7 @@ func scan(args []string) int {
 	}
 	term := ui.New(os.Stdout)
 	report, err := audit.Run(context.Background(), cfg, term.Step)
-	if err != nil {
+	if err != nil && report.FinishedAt.IsZero() {
 		term.Error(err.Error())
 		return 1
 	}
@@ -130,7 +147,8 @@ func scan(args []string) int {
 	term.KeyValue("Files", fmt.Sprint(report.Stats.FilesInspected))
 	term.KeyValue("Indicators", fmt.Sprintf("%d high / %d medium / %d low / %d info", report.Stats.High, report.Stats.Medium, report.Stats.Low, report.Stats.Info))
 	if report.Nmap != nil {
-		term.KeyValue("Nmap", fmt.Sprintf("%s · %d open TCP ports", report.Nmap.Status, report.Nmap.OpenTCPPorts))
+		term.KeyValue("Nmap", fmt.Sprintf("%s · %s · %d TCP / %d UDP ports open", report.Nmap.Status, report.Nmap.Profile, report.Nmap.OpenTCPPorts, report.Nmap.OpenUDPPorts))
+		term.KeyValue("Hosts", fmt.Sprint(report.Nmap.HostsUp))
 	}
 	if len(report.Warnings) > 0 {
 		for _, w := range report.Warnings {
@@ -141,13 +159,17 @@ func scan(args []string) int {
 	term.KeyValue("HTML", filepath.Join(output, "report.html"))
 	term.KeyValue("JSON", filepath.Join(output, "report.json"))
 	term.KeyValue("Markdown", filepath.Join(output, "report.md"))
+	if err != nil {
+		term.Error(err.Error())
+		return 1
+	}
 	return 0
 }
 
 // Accepts a single path before or after flags, including: scan ./project --out ./report.
 func movePositionals(args []string) []string {
 	var flags, positions []string
-	takesValue := map[string]bool{"--path": true, "--url": true, "--out": true, "--max-files": true, "--timeout": true, "--nmap-bin": true}
+	takesValue := map[string]bool{"--path": true, "--url": true, "--target": true, "--out": true, "--max-files": true, "--timeout": true, "--nmap-bin": true, "--nmap-profile": true, "--nmap-timeout": true}
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
 		if strings.HasPrefix(arg, "-") {
@@ -200,13 +222,17 @@ func repl() int {
 			} else {
 				fmt.Println("Last report:", lastReport)
 			}
-		case "scan":
-			if scan(parts[1:]) == 0 {
-				out := outputFromArgs(parts[1:])
+		case "scan", "nmap":
+			params := parts[1:]
+			if parts[0] == "nmap" {
+				params = append([]string{"--nmap"}, params...)
+			}
+			if scan(params) == 0 {
+				out := outputFromArgs(params)
 				lastReport = filepath.Join(out, "report.html")
 			}
 		default:
-			term.Warn("Unknown command. Use: scan, doctor, status, help, version, exit")
+			term.Warn("Unknown command. Use: scan, nmap, doctor, status, help, version, exit")
 		}
 	}
 	if err := scanner.Err(); err != nil && !errors.Is(err, io.EOF) {

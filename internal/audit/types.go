@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"net"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -14,17 +15,23 @@ import (
 	"time"
 )
 
-const Version = "0.2.0"
+const Version = "0.3.0"
 
 type Config struct {
-	Path       string
-	URL        string
-	Output     string
-	Authorized bool
-	Nmap       bool
-	NmapBinary string
-	MaxFiles   int
-	Timeout    time.Duration
+	Path        string
+	URL         string
+	Output      string
+	Authorized  bool
+	Nmap        bool
+	NmapBinary  string
+	Target      string
+	NmapProfile string
+	NmapTimeout time.Duration
+	NmapUDP     bool
+	NmapOS      bool
+	NmapScripts bool
+	MaxFiles    int
+	Timeout     time.Duration
 }
 
 type Finding struct {
@@ -55,6 +62,7 @@ type Report struct {
 	FinishedAt time.Time    `json:"finished_at"`
 	Path       string       `json:"path,omitempty"`
 	URL        string       `json:"url,omitempty"`
+	Target     string       `json:"target,omitempty"`
 	Stats      Stats        `json:"stats"`
 	Findings   []Finding    `json:"findings"`
 	Warnings   []string     `json:"warnings"`
@@ -63,14 +71,39 @@ type Report struct {
 }
 
 func (c *Config) validate() error {
-	if c.Path == "" && c.URL == "" {
-		return errors.New("provide a project path or a web URL")
+	if c.Path == "" && c.URL == "" && c.Target == "" {
+		return errors.New("provide a project path, web URL, or an Nmap --target")
 	}
 	if c.NmapBinary != "" && !c.Nmap {
 		return errors.New("--nmap-bin requires --nmap")
 	}
-	if c.Nmap && c.URL == "" {
-		return errors.New("--nmap requires --url")
+	if c.Nmap && c.URL == "" && c.Target == "" {
+		return errors.New("--nmap requires --target or --url")
+	}
+	if c.Target != "" && !c.Nmap {
+		return errors.New("--target requires --nmap")
+	}
+	if (c.Nmap || c.Target != "") && !c.Authorized {
+		return errors.New("Nmap requires --authorized and explicit permission from the target owner")
+	}
+	if !c.Nmap && (c.NmapProfile != "" || c.NmapTimeout != 0 || c.NmapUDP || c.NmapOS || c.NmapScripts) {
+		return errors.New("Nmap options require --nmap")
+	}
+	if c.Nmap {
+		if c.NmapProfile == "" {
+			c.NmapProfile = "standard"
+		}
+		if c.NmapProfile != "quick" && c.NmapProfile != "standard" && c.NmapProfile != "full" {
+			return errors.New("--nmap-profile must be quick, standard or full")
+		}
+		if c.NmapTimeout != 0 && (c.NmapTimeout < 15*time.Second || c.NmapTimeout > 30*time.Minute) {
+			return errors.New("--nmap-timeout must be between 15s and 30m")
+		}
+	}
+	if c.Target != "" {
+		if err := validateNmapTarget(c.Target); err != nil {
+			return err
+		}
 	}
 	if c.URL != "" {
 		if !c.Authorized {
@@ -82,6 +115,14 @@ func (c *Config) validate() error {
 		}
 		if strings.ContainsAny(u.Hostname(), " \t\n") || strings.HasPrefix(u.Hostname(), "-") {
 			return errors.New("invalid URL hostname")
+		}
+		if c.Target != "" && !strings.EqualFold(c.Target, u.Hostname()) {
+			return errors.New("--target must match the hostname in --url; cross-target scans are not supported")
+		}
+		if c.Nmap {
+			if err := validateNmapTarget(u.Hostname()); err != nil {
+				return fmt.Errorf("invalid Nmap URL hostname: %w", err)
+			}
 		}
 		if u.Fragment != "" || u.RawQuery != "" {
 			return errors.New("URL query parameters and fragments are not supported; provide a clean endpoint URL")
@@ -120,6 +161,32 @@ func (c *Config) validate() error {
 	}
 	if c.Timeout > 60*time.Second {
 		return errors.New("--timeout must be <= 60 seconds")
+	}
+	return nil
+}
+
+func validateNmapTarget(target string) error {
+	if len(target) == 0 || len(target) > 253 || strings.HasPrefix(target, "-") || (strings.ContainsAny(target, " \t\n\r/\\[]:%@") && net.ParseIP(target) == nil) {
+		return errors.New("--target must be one IP address or DNS hostname, not a URL, CIDR or flag")
+	}
+	if net.ParseIP(target) != nil {
+		return nil
+	}
+	if strings.HasSuffix(target, ".") {
+		target = strings.TrimSuffix(target, ".")
+	}
+	if target == "" {
+		return errors.New("--target cannot be empty")
+	}
+	for _, label := range strings.Split(target, ".") {
+		if len(label) == 0 || len(label) > 63 || label[0] == '-' || label[len(label)-1] == '-' {
+			return errors.New("invalid DNS hostname in --target")
+		}
+		for _, c := range label {
+			if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-') {
+				return errors.New("invalid DNS hostname in --target")
+			}
+		}
 	}
 	return nil
 }
@@ -165,7 +232,7 @@ func Run(ctx context.Context, cfg Config, progress func(string)) (Report, error)
 	if err := cfg.validate(); err != nil {
 		return report, err
 	}
-	report.Path, report.URL = cfg.Path, cfg.URL
+	report.Path, report.URL, report.Target = cfg.Path, cfg.URL, cfg.Target
 	say := func(s string) {
 		if progress != nil {
 			progress(s)
@@ -184,7 +251,7 @@ func Run(ctx context.Context, cfg Config, progress func(string)) (Report, error)
 		report.Checks = append(report.Checks, "HTTP response headers (HEAD request only, no redirects)")
 	}
 	if cfg.Nmap {
-		say("Checking common TCP ports with Nmap...")
+		say("Running Nmap " + cfg.NmapProfile + " network inventory...")
 		scanNmap(ctx, cfg, &report)
 		report.Checks = append(report.Checks, "Optional Nmap TCP connect and light service discovery (100 common ports, low rate, 80s host limit)")
 	}
@@ -193,6 +260,9 @@ func Run(ctx context.Context, cfg Config, progress func(string)) (Report, error)
 	say("Writing HTML, Markdown and JSON reports...")
 	if err := WriteReports(cfg.Output, report); err != nil {
 		return report, err
+	}
+	if cfg.Nmap && report.Nmap != nil && report.Nmap.Status != "completed" {
+		return report, fmt.Errorf("Nmap scan %s; review report warnings and installation", report.Nmap.Status)
 	}
 	return report, nil
 }
