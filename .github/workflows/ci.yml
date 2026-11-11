@@ -25,7 +25,16 @@ jobs:
           cache: false
       - name: Go test
         run: go test -count=1 ./...
+      - name: Go race checks (Linux)
+        if: runner.os == 'Linux'
+        run: go test -race -count=1 ./...
       - name: Go vet
         run: go vet ./...
       - name: Build CLI
         run: go build ./cmd/secubrain
+      - name: Animated dashboard PTY smoke (Linux)
+        if: runner.os == 'Linux'
+        run: python3 docs/pty_smoke.py
+      - name: Terminal renderer benchmark (Linux)
+        if: runner.os == 'Linux'
+        run: go test -run '^$' -bench '^BenchmarkDashboard' -benchtime=300x -benchmem ./internal/ui

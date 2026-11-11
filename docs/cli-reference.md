@@ -1,4 +1,4 @@
-# Command-line reference — v0.3.0
+# Command-line reference — v0.4.0
 
 SecuBrain is a local-first deterministic Go executable. It supports non-interactive commands and a small built-in interactive prompt. No AI, cloud account, or custom shell-command execution is required.
 
@@ -47,6 +47,6 @@ A `scan` command with both `--url` and `--target` must refer to the **same** hos
 
 On success, reports are created at `<out>/report.json`, `<out>/report.html`, and `<out>/report.md`. On Nmap failure or absence, the tool returns a **nonzero exit status** and preserves any available report data and diagnostics. Treat a clean scan as the absence of observed indicators within the selected profile, **not** proof of security.
 
-The interactive prompt retains `scan`, `nmap`, `doctor`, `status`, `help`, `version`, `exit` and `quit`. Presentation changes are **not** the focus of v0.3.
+On a real supported Windows or Linux terminal, `secubrain` now launches the animated neural dashboard. It supports `scan`, `nmap`, `doctor`, `status`, `help`, `version`, `history`, `clear`, `exit`, and `quit`, plus arrow-key editing, Tab completion, cancellation and live progress. Piped input, CI and unsupported terminals use the original simple prompt. See [terminal experience](terminal-experience.md).
 
 Read [Nmap integration](nmap-integration.md), [report format](report-format.md), and [installation](windows-installer.md) for details.

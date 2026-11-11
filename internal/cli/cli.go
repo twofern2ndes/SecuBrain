@@ -78,14 +78,18 @@ Use only systems you own or are explicitly authorized to assess.
 }
 
 func doctor(args []string) int {
+	return doctorTo(args, os.Stdout, os.Stderr)
+}
+
+func doctorTo(args []string, out, errout io.Writer) int {
 	fs := flag.NewFlagSet("doctor", flag.ContinueOnError)
-	fs.SetOutput(os.Stderr)
+	fs.SetOutput(errout)
 	var nmapBinary string
 	fs.StringVar(&nmapBinary, "nmap-bin", "", "path to installed Nmap")
 	if err := fs.Parse(args); err != nil || fs.NArg() != 0 {
 		return 2
 	}
-	term := ui.New(os.Stdout)
+	term := ui.New(out)
 	term.Heading("SYSTEM / DEPENDENCY CHECK")
 	term.KeyValue("SecuBrain", audit.Version+" · Go standard library")
 	term.Success("No AI model or online service required for local audits")
@@ -100,13 +104,17 @@ func doctor(args []string) int {
 		term.KeyValue("Binary", status.Binary)
 		term.KeyValue("Discovery", status.Source)
 	}
-	fmt.Println()
+	fmt.Fprintln(out)
 	return 0
 }
 
 func scan(args []string) int {
+	return scanTo(context.Background(), args, os.Stdout, os.Stderr, nil)
+}
+
+func scanTo(ctx context.Context, args []string, out, errout io.Writer, progress func(string)) int {
 	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
-	fs.SetOutput(os.Stderr)
+	fs.SetOutput(errout)
 	var cfg audit.Config
 	fs.StringVar(&cfg.Path, "path", "", "local project folder")
 	fs.StringVar(&cfg.URL, "url", "", "authorized web URL")
@@ -126,18 +134,22 @@ func scan(args []string) int {
 		return 2
 	}
 	if fs.NArg() > 1 {
-		fmt.Fprintln(os.Stderr, "Expected at most one positional path")
+		fmt.Fprintln(errout, "Expected at most one positional path")
 		return 2
 	}
 	if fs.NArg() == 1 {
 		if cfg.Path != "" {
-			fmt.Fprintln(os.Stderr, "Use either --path or a positional path, not both")
+			fmt.Fprintln(errout, "Use either --path or a positional path, not both")
 			return 2
 		}
 		cfg.Path = fs.Arg(0)
 	}
-	term := ui.New(os.Stdout)
-	report, err := audit.Run(context.Background(), cfg, term.Step)
+	term := ui.New(out)
+	step := term.Step
+	if progress != nil {
+		step = progress
+	}
+	report, err := audit.Run(ctx, cfg, step)
 	if err != nil && report.FinishedAt.IsZero() {
 		term.Error(err.Error())
 		return 1
@@ -186,6 +198,9 @@ func movePositionals(args []string) []string {
 }
 
 func repl() int {
+	if code, ok := ui.StartDashboard(context.Background(), os.Stdin, os.Stdout, audit.Version, interactiveCommand); ok {
+		return code
+	}
 	term := ui.New(os.Stdout)
 	term.Banner(audit.Version)
 	scanner := bufio.NewScanner(os.Stdin)
@@ -240,6 +255,48 @@ func repl() int {
 		return 1
 	}
 	return 0
+}
+
+// interactiveCommand bridges the animated UI to the same real scan and doctor
+// implementations used in noninteractive mode. This path never changes the
+// scanner's authorization checks, timeouts, or report format.
+func interactiveCommand(ctx context.Context, command string, emit func(string)) int {
+	parts, err := splitCommand(command)
+	if err != nil {
+		emit("Invalid command: " + err.Error())
+		return 2
+	}
+	if len(parts) == 0 {
+		return 0
+	}
+	var output, failures strings.Builder
+	var code int
+	switch parts[0] {
+	case "scan":
+		code = scanTo(ctx, parts[1:], &output, &failures, emit)
+	case "nmap":
+		args := append([]string{"--nmap"}, parts[1:]...)
+		code = scanTo(ctx, args, &output, &failures, emit)
+	case "doctor", "tools":
+		code = doctorTo(parts[1:], &output, &failures)
+	case "version":
+		fmt.Fprintf(&output, "SecuBrain %s", audit.Version)
+	case "help", "--help", "-h":
+		output.WriteString("Commands: scan, nmap, doctor, status, history, help, clear, version, exit")
+		output.WriteString("\nRun: scan --path ./project --out ./reports")
+		output.WriteString("\nRun: nmap --target HOST --authorized --nmap-profile quick")
+		output.WriteString("\nUse 'secubrain help' outside the dashboard for full command-line options.")
+	default:
+		emit("Unknown command: " + parts[0] + ". Available: scan, nmap, doctor, help, version, exit")
+		return 2
+	}
+	if output.Len() > 0 {
+		emit(output.String())
+	}
+	if failures.Len() > 0 {
+		emit(failures.String())
+	}
+	return code
 }
 
 func outputFromArgs(args []string) string {

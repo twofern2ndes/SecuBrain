@@ -41,7 +41,7 @@ Parsing a directory or a remote response does not guarantee correctness. Static 
 
 Reports suppress matched credential values but can include file locations and endpoint names. Review the generated reports before sharing them externally.
 
-## 0.3.0 components
+## 0.4.0 components
 
 - `internal/ui` handles the TTY-aware CLI presentation, plain fallback and Windows console virtual terminal setup.
 - `internal/audit/nmap.go` locates Nmap separately, queries its version, runs a controlled profile-specific command through `exec.CommandContext` and parses detailed Nmap XML, including host/port/service/version/NSE/OS metadata. No raw command flags are passed through.

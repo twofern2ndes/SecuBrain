@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1340" height="935" viewBox="0 0 1340 935">
+<rect width="100%" height="100%" rx="22" fill="#090F1B"/>
+<rect x="23" y="23" width="1294" height="890" rx="16" fill="#0C1423" stroke="#2A3C55" stroke-width="2"/>
+<rect x="23" y="23" width="1294" height="48" rx="16" fill="#162239"/>
+<circle cx="60" cy="47" r="7" fill="#E77688"/><circle cx="85" cy="47" r="7" fill="#F4CD78"/><circle cx="110" cy="47" r="7" fill="#79DAAD"/>
+<text x="670" y="54" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" letter-spacing="3" fill="#AFBFD6">SECUBRAIN / LIVE TERMINAL SESSION</text>
+<g font-family="Cascadia Code, Consolas, DejaVu Sans Mono, monospace" font-size="16.5" xml:space="preserve">
+<text x="56" y="104" fill="#5A99BC">  ╭────────────────────────────────────────────────────────────────────────────────────────────────╮</text>
+<text x="56" y="124" fill="#DCF8F5">  │  ◈ SECUBRAIN / v0.4.0                                                                   ◉ READY│</text>
+<text x="56" y="144" fill="#5A99BC">  ╰────────────────────────────────────────────────────────────────────────────────────────────────╯</text>
+<text x="56" y="164" fill="#5A99BC">                                      ╭────────╮    ╭────────╮</text>
+<text x="56" y="184" fill="#5A99BC">                                  ╭───╯        ╰────╯        ╰───╮</text>
+<text x="56" y="204" fill="#71E1D3">                                ╭─╯           ●──◆───◆●╲╲╲╲╲◆    ╰─╮</text>
+<text x="56" y="224" fill="#71E1D3">                               ╭╯     ╱◉╱╱╱╱╱╱  ╲   ╱   ╲   ╱●╲    ╰╮</text>
+<text x="56" y="244" fill="#71E1D3">                               │    ╱╱   ◆╲ ╱    ╲ ╱     ╲ ╱   ╲╲   │</text>
+<text x="56" y="264" fill="#71E1D3">                               │   ●────◆──●──────●───────◉──◆───●  │</text>
+<text x="56" y="284" fill="#5A99BC">                               ╰╮   ╲   ╱╱  ╲   ╱   ╲   ╱   ╲   ╱  ╭╯</text>
+<text x="56" y="304" fill="#71E1D3">                                ╰╮   ╲ ◆     ╲ ╱     ╲ ╱     ◆ ╱  ╭╯</text>
+<text x="56" y="324" fill="#71E1D3">                                 ╰╮   ●╲╲    ╱◉╲╲╲    ●    ╱╱╱●  ╭╯</text>
+<text x="56" y="344" fill="#71E1D3">                                  ╰╮     ◆╲ ╱     ╲◆╲╲│╱╱╱╱     ╭╯</text>
+<text x="56" y="364" fill="#71E1D3">                                   ╰─────╮ ●──────────● ╭─────╯</text>
+<text x="56" y="384" fill="#5A99BC">                                         ╰──────┬───────╯</text>
+<text x="56" y="404" fill="#71E1D3">                                     ◉ NEURAL LINK READY</text>
+<text x="56" y="424" fill="#73AFCB">  ── WORKSPACE ──────────────────────────────────────────────────────────────────────────────────</text>
+<text x="56" y="444" fill="#A4C5D9">  SCAN / scan --path ./project     NETWORK / nmap --target HOST --authorized</text>
+<text x="56" y="464" fill="#A4C5D9">  TOOLS / doctor                 GUIDE / help             EXIT / exit</text>
+<text x="56" y="484" fill="#73AFCB">  ── ACTIVITY ───────────────────────────────────────────────────────────────────────────────────</text>
+<text x="56" y="504" fill="#8DECC4">  ✓ Engine ready · offline-first · no AI dependency</text>
+<text x="56" y="524" fill="#A4C5D9">  · Enter help to see commands, or try doctor</text>
+<text x="56" y="544" fill="#A4C5D9"></text>
+<text x="56" y="564" fill="#A4C5D9"></text>
+<text x="56" y="584" fill="#A4C5D9"></text>
+<text x="56" y="604" fill="#A4C5D9"></text>
+<text x="56" y="624" fill="#A4C5D9"></text>
+<text x="56" y="644" fill="#A4C5D9"></text>
+<text x="56" y="664" fill="#A4C5D9"></text>
+<text x="56" y="684" fill="#A4C5D9"></text>
+<text x="56" y="704" fill="#A4C5D9"></text>
+<text x="56" y="724" fill="#A4C5D9"></text>
+<text x="56" y="744" fill="#A4C5D9"></text>
+<text x="56" y="764" fill="#A4C5D9"></text>
+<text x="56" y="784" fill="#A4C5D9"></text>
+<text x="56" y="804" fill="#73AFCB">  ╭─ COMMAND ─────────────────────────────────────────────────────────────────────────────────────</text>
+<text x="56" y="824" fill="#A4C5D9">  ❯   </text>
+<text x="56" y="844" fill="#A4C5D9">  Enter: run   ↑↓: history   Tab: complete   Ctrl+C: cancel   Ctrl+D: exit</text>
+</g>
+</svg>

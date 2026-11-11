@@ -1,11 +1,11 @@
-# Windows installation / v0.3.0
+# Windows installation / v0.4.0
 
 This page describes the **official SecuBrain installer build** (Windows x64, unprivileged per-user installation). It does **not** install Nmap or Npcap: these tools are under separate licenses and must be obtained independently.
 
 ## Obtain the installer
 
-1. Open [SecuBrain releases](https://github.com/twofern2ndes/SecuBrain/releases/tag/v0.3.0).
-2. Download the asset named `SecuBrain-Setup-v0.3.0-windows-x64.exe` from the prerelease, if published.
+1. Open [SecuBrain releases](https://github.com/twofern2ndes/SecuBrain/releases/tag/v0.4.0).
+2. Download the asset named `SecuBrain-Setup-v0.4.0-windows-x64.exe` from the prerelease, if published.
 3. Download `SHA256SUMS.txt` and compare the SHA-256 value against your downloaded executable.
 4. Launch the installer and follow the guided setup.
 
@@ -66,14 +66,14 @@ go build -trimpath -ldflags "-s -w" -o dist\secubrain.exe ./cmd/secubrain
 & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\SecuBrain.iss
 ```
 
-The output is written to `dist/SecuBrain-Setup-v0.3.0-windows-x64.exe`.
+The output is written to `dist/SecuBrain-Setup-v0.4.0-windows-x64.exe`.
 
 A GitHub Actions Windows runner executes the test suite, compiles the CLI, invokes Inno Setup, performs an unattended **CI-only** installation smoke test, calculates a SHA-256 checksum and uploads the installer artifact. Silent CI installation is for automated verification; interactive installation normally displays the full acceptance page.
 
 ### Limitations
 
 - Windows 10/11 x64 only; other operating systems can build the CLI from Go source.
-- Code signing and independent security review are not included in v0.3.0.
+- Code signing and independent security review are not included in v0.4.0.
 - Application tests use a fake Nmap executable with verified fixed arguments; this does not prove network scan reliability in every environment.
 - SecuBrain cannot verify that you legally own or administer a target. Authorization is the operator's responsibility.
 
@@ -86,6 +86,10 @@ A GitHub Actions Windows runner executes the test suite, compiles the CLI, invok
 **Endpoint detection returns no findings:** no open TCP ports were observed in the bounded common-port scan. This is not proof that the system is secure.
 
 **Third-party anti-malware alert:** do not disable security software automatically. Verify the downloaded artifact and review the source; report potential issues to project maintainers.
+
+## Terminal changes in v0.4
+
+The same installed `secubrain.exe` now presents the animated neural dashboard when launched in a supported Windows console with interactive input. It falls back to the regular prompt for redirected input or incompatible consoles. No extra GUI runtime, browser, cloud account or AI model is required. See [terminal experience](terminal-experience.md).
 
 ## Changes in v0.3
 

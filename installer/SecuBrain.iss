@@ -3,7 +3,7 @@
 ; Nmap and Npcap are NOT distributed by this setup. Users install them independently.
 
 #define AppName "SecuBrain"
-#define AppVersion "0.3.0"
+#define AppVersion "0.4.0"
 #define AppPublisher "twofern2ndes"
 
 [Setup]
@@ -38,7 +38,7 @@ DisableWelcomePage=no
 DisableDirPage=no
 DisableReadyPage=no
 DisableFinishedPage=no
-VersionInfoVersion=0.3.0.0
+VersionInfoVersion=0.4.0.0
 VersionInfoDescription=SecuBrain local-first security auditing CLI
 VersionInfoCompany={#AppPublisher}
 VersionInfoProductName={#AppName}

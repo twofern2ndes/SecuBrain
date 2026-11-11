@@ -97,12 +97,12 @@ jobs:
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
           & $iscc 'installer\SecuBrain.iss'
           if ($LASTEXITCODE -ne 0) { exit 1 }
-          if (-not (Test-Path 'dist\SecuBrain-Setup-v0.3.0-windows-x64.exe')) { throw 'Installer missing' }
+          if (-not (Test-Path 'dist\SecuBrain-Setup-v0.4.0-windows-x64.exe')) { throw 'Installer missing' }
 
       - name: Install and uninstall smoke test (CI only)
         shell: pwsh
         run: |
-          $setup = (Resolve-Path 'dist\SecuBrain-Setup-v0.3.0-windows-x64.exe').Path
+          $setup = (Resolve-Path 'dist\SecuBrain-Setup-v0.4.0-windows-x64.exe').Path
           $testDir = Join-Path $env:RUNNER_TEMP 'SecuBrain-TestInstall'
           $args = @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $testDir + '"'))
           $proc = Start-Process -FilePath $setup -ArgumentList $args -Wait -PassThru
@@ -121,7 +121,7 @@ jobs:
       - name: Create SHA-256 checksum
         shell: pwsh
         run: |
-          $setup = Get-Item 'dist\SecuBrain-Setup-v0.3.0-windows-x64.exe'
+          $setup = Get-Item 'dist\SecuBrain-Setup-v0.4.0-windows-x64.exe'
           $hash = (Get-FileHash -Algorithm SHA256 -Path $setup.FullName).Hash.ToLowerInvariant()
           "$hash  $($setup.Name)" | Out-File -FilePath 'dist\SHA256SUMS.txt' -Encoding ascii
           Get-Content 'dist\SHA256SUMS.txt'
@@ -129,9 +129,9 @@ jobs:
       - name: Upload installer as workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SecuBrain-v0.3.0-Windows-Installer
+          name: SecuBrain-v0.4.0-Windows-Installer
           path: |
-            dist/SecuBrain-Setup-v0.3.0-windows-x64.exe
+            dist/SecuBrain-Setup-v0.4.0-windows-x64.exe
             dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 90
@@ -142,10 +142,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view 'v0.3.0' --repo $env:GITHUB_REPOSITORY *> $null
+          gh release view 'v0.4.0' --repo $env:GITHUB_REPOSITORY *> $null
           if ($LASTEXITCODE -eq 0) {
-            Write-Host 'v0.3.0 release already exists; do not silently replace published assets.'
+            Write-Host 'v0.4.0 release already exists; do not silently replace published assets.'
             exit 0
           }
-          gh release create 'v0.3.0' 'dist/SecuBrain-Setup-v0.3.0-windows-x64.exe' 'dist/SHA256SUMS.txt' --repo $env:GITHUB_REPOSITORY --target '${{ github.sha }}' --title 'SecuBrain 0.3.0 — Windows Installer & Nmap Adapter' --notes-file 'docs/release-notes/v0.3.0.md' --prerelease
+          gh release create 'v0.4.0' 'dist/SecuBrain-Setup-v0.4.0-windows-x64.exe' 'dist/SHA256SUMS.txt' --repo $env:GITHUB_REPOSITORY --target '${{ github.sha }}' --title 'SecuBrain 0.4.0 — Windows Installer & Nmap Adapter' --notes-file 'docs/release-notes/v0.4.0.md' --prerelease
           if ($LASTEXITCODE -ne 0) { exit 1 }

@@ -6,9 +6,9 @@
 
 <p align="center">Inventory a single authorized network host, inspect local source code, review HTTP response headers and export locally stored HTML, Markdown and JSON reports.</p>
 
-<p align="center"><a href="https://github.com/twofern2ndes/SecuBrain/releases/tag/v0.3.0">Windows release</a> · <a href="#quick-start">Quick start</a> · <a href="docs/nmap-integration.md">Nmap guide</a> · <a href="docs/architecture.md">Architecture</a> · <a href="SECURITY.md">Security policy</a></p>
+<p align="center"><a href="https://github.com/twofern2ndes/SecuBrain/releases/tag/v0.4.0">Windows release</a> · <a href="#quick-start">Quick start</a> · <a href="docs/nmap-integration.md">Nmap guide</a> · <a href="docs/architecture.md">Architecture</a> · <a href="SECURITY.md">Security policy</a></p>
 
-<p align="center"><sub>v0.3.0 PRERELEASE &nbsp; / &nbsp; GO 1.23+ &nbsp; / &nbsp; WINDOWS X64 INSTALLER &nbsp; / &nbsp; NO AI REQUIRED</sub></p>
+<p align="center"><sub>v0.4.0 PRERELEASE &nbsp; / &nbsp; GO 1.23+ &nbsp; / &nbsp; WINDOWS X64 INSTALLER &nbsp; / &nbsp; NO AI REQUIRED</sub></p>
 
 ---
 
@@ -17,7 +17,7 @@
 
 ## Overview
 
-SecuBrain brings separate diagnostic checks into a reproducible CLI workflow. It does not execute natural-language commands, ask an AI model to operate tools or invoke a shell to build network scans. A user-installed **Nmap** supplies real TCP/optional UDP scanning; the first-party Go code controls scope, interprets XML and records evidence. No Nmap or Npcap executable is bundled.
+SecuBrain brings separate diagnostic checks into a reproducible CLI workflow. The v0.4 terminal experience introduces a responsive, full-screen neural dashboard for interactive work, with unchanged deterministic audit behavior. It does not execute natural-language commands, ask an AI model to operate tools or invoke a shell to build network scans. A user-installed **Nmap** supplies real TCP/optional UDP scanning; the first-party Go code controls scope, interprets XML and records evidence. No Nmap or Npcap executable is bundled.
 
 ```text
                  Explicit operator input
@@ -41,10 +41,12 @@ SecuBrain brings separate diagnostic checks into a reproducible CLI workflow. It
                      (local files)
 ```
 
-### Implemented in v0.3
+### Implemented in v0.4
 
 | Capability | Implementation |
 |---|---|
+| **Animated neural dashboard** | Original brain-and-neural-network animation with live pulses, command input, history, cancellation and responsive terminal layouts; zero external Go UI dependencies |
+| **Safe fallback mode** | Automatically keeps the plain console for non-TTY streams, CI, reduced-motion and incompatible terminals |
 | **Nmap detection** | Locate via `PATH`, standard Windows install paths, explicit `--nmap-bin` or `SECUBRAIN_NMAP_PATH`; query installed version |
 | **Quick Nmap profile** | Nmap `-F` (~100 common TCP ports), light service/version probes |
 | **Standard Nmap profile** | Nmap's ~1000 common TCP ports, moderate version intensity |
@@ -56,7 +58,7 @@ SecuBrain brings separate diagnostic checks into a reproducible CLI workflow. It
 | **HTTP headers** | One HEAD request to an explicitly authorized URL, without following redirects |
 | **Reports** | JSON canonical inventory plus HTML and Markdown review documents |
 | **Windows setup** | Inno Setup wizard, license acceptance, optional user PATH/shortcuts, uninstaller, Nmap prerequisite guidance |
-| **Automated checks** | Go tests/vet/race; Ubuntu real-Nmap loopback CI before Windows installer workflow |
+| **Automated checks** | Go tests/vet/race, real PTY dashboard smoke, Ubuntu real-Nmap loopback CI and Windows installer validation |
 
 Not implemented: AI assistants, Metasploit, Hydra, credential attacks, vulnerability exploitation, CVE validation, arbitrary NSE scripts, mass-target/CIDR scanning, or all Nmap capabilities. The `full` profile is **full TCP port coverage**, not unlimited network assessment.
 
@@ -64,7 +66,7 @@ Not implemented: AI assistants, Metasploit, Hydra, credential attacks, vulnerabi
 
 ### 1. Install SecuBrain
 
-For Windows x64, use the [v0.3.0 GitHub prerelease](https://github.com/twofern2ndes/SecuBrain/releases/tag/v0.3.0) once the CI-validated installer appears. The guided installation contains terms, selected folder, PATH option, optional shortcuts, and uninstall support. Source builds also work on Linux/macOS/Windows:
+For Windows x64, use the [v0.4.0 GitHub prerelease](https://github.com/twofern2ndes/SecuBrain/releases/tag/v0.4.0) once the CI-validated installer appears. The guided installation contains terms, selected folder, PATH option, optional shortcuts, and uninstall support. Source builds also work on Linux/macOS/Windows:
 
 ```bash
 git clone https://github.com/twofern2ndes/SecuBrain.git
@@ -122,7 +124,13 @@ See [report schema](docs/report-format.md) and the full [Nmap integration guide]
 
 ## Test fixtures and screenshots
 
-The following images were generated from earlier **synthetic fixtures and local CLI tests** for illustration. In particular, the Nmap diagram uses a fake Nmap process, **not a real production scan**. The v0.3.0 release additionally adds a *real Nmap loopback check in CI*, which is independent of these images.
+The animated dashboard preview below is rendered from a captured, real local PTY session, not generated artwork.
+
+![SecuBrain animated dashboard, real PTY frame](docs/assets/terminal-dashboard-v04.svg)
+
+See the [terminal experience documentation](docs/terminal-experience.md) for controls, accessibility and testing, and the [five reproducible verification gates](docs/quality-gates.md).
+
+The following images were generated from earlier **synthetic fixtures and local CLI tests** for illustration. In particular, the Nmap diagram uses a fake Nmap process, **not a real production scan**. The project also runs a *real Nmap loopback check in CI*, which is independent of these images.
 
 | SecuBrain sample terminal | Nmap adapter fixture |
 |---|---|
@@ -136,7 +144,8 @@ The following images were generated from earlier **synthetic fixtures and local 
 
 ```text
 cmd/secubrain/               CLI entrypoint
-internal/cli/                commands, options and interactive prompt
+internal/cli/                commands, options and interactive command bridge
+internal/ui/                 animated dashboard, keyboard parser, neural renderer
 internal/audit/              scope validation, real Nmap adapter,
                              local/HTTP scanners, JSON/HTML/MD reports
 internal/audit/testdata/     no-network Nmap test double
@@ -178,7 +187,8 @@ The public availability of this source tree does not automatically grant open-so
 
 ## Roadmap
 
-- Stabilize more Nmap XML edge cases and add optional authorized Windows+Npcap smoke tests.
+- Stabilize Nmap XML edge cases and add optional authorized Windows+Npcap smoke tests.
+- Improve text editing and consider native ConPTY integration for additional Windows terminal variants.
 - Improve target/asset inventory export, diagnostics and error classification.
 - Continue usability and accessibility work **after** the auditing engine is stable.
 - Evaluate other defensive scanning adapters in future releases, each with explicit operator scope, independent licenses and reproducible tests.
