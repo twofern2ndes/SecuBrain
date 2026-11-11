@@ -74,6 +74,7 @@ try:
     if child.returncode or missing:
         raise AssertionError(f"code={child.returncode}, missing={missing}, bytes={len(data)}")
     print(f"PTY live dashboard passed: {len(data):,} bytes, local scan and reports, resize and terminal restore")
+    Path("dist").mkdir(parents=True, exist_ok=True)
     with open("dist/dashboard-pty-capture.ansi", "wb") as handle:
         handle.write(data[:1_200_000])
 finally:
