@@ -1,8 +1,8 @@
 # Terminal experience / SecuBrain v0.4.0
 
-The v0.4 user interface is original Go code. It does not repackage Claude Code,
-Codex, Hermes, or any other product. The project preserves the deterministic
-scanning engine, network authorization checks, and report outputs from v0.3.
+The v0.4 terminal interface is implemented in Go as part of SecuBrain. The
+scanning engine, network authorization checks, and report outputs remain
+compatible with v0.3.
 
 ![Actual terminal screenshot derived from a local PTY capture](assets/terminal-dashboard-v04.svg)
 
@@ -114,5 +114,5 @@ python3 docs/render_terminal_preview.py dist/dashboard-pty-capture.ansi
 ```
 
 The SVG is derived from terminal output emitted by the actual executable.
-The color styling is applied during SVG formatting; it is not a claim that
-any remote target was scanned or that an AI model was involved.
+The color styling is applied during SVG formatting; this illustration is not
+evidence of a remote scan.

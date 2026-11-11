@@ -1,9 +1,8 @@
-# SecuBrain v0.4.0 / independent verification gates
+# SecuBrain v0.4.0 / release verification
 
-The development environment does **not** provide five independent AI agents.
-The following are five reproducible technical review tracks, not synthetic
-"agent scores" or guarantees of defect-free behavior. Each has a binary,
-objective passing criterion.
+The release process uses five reproducible technical checks, each with an
+objective passing criterion. These checks apply to the behaviors and environments
+covered by the tests; they are not a guarantee of defect-free operation.
 
 | Gate | Purpose | Verification |
 |---|---|---|
@@ -16,4 +15,3 @@ objective passing criterion.
 A release is considered verified only for the environments and operations
 actually covered by passing tests. CI does not test every physical Windows
 terminal, font, antivirus product, privilege level or Npcap installation.
-There are no invented subjective review scores.
